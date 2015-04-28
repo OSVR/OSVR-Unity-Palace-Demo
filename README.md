@@ -5,8 +5,11 @@ If you want the executable, download here: https://www.dropbox.com/s/6tyoh4vxb3n
 
 # Installation instructions:
 1) Download the latest 32-bit version of the OSVR-Core Snapshot: http://access.osvr.com/binary/osvr-core
+
 Current source version for this example: v0.2-5-g1d72171
-Newer Core versions will probably work, but versions below v0.2 won't work. I will keep updating as new builds appear daily.
+
+Newer Core versions will probably work, but versions below v0.2 won't work. 
+I will keep updating as new builds appear daily.
 64-bit support is coming soon.
 
 2) In the OSVR-Core Snapshot download, navigate to the bin folder to find:
