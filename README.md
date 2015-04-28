@@ -17,7 +17,9 @@ osvr_server_config.json -- this must be configured for your device. By default i
 
 Example for Sensics dSight:
 Copy the contents of osvr_server_config.dSight.json into osvr_server_config.json.
+
 Start osvr_server.exe
+
 Start Unity app osvr_palace.exe
 
 
