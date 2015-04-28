@@ -3,7 +3,7 @@ A simple example OSVR Unity project. Built with Unity 4. Upgrading to 5 is seaml
 
 If you want the executable, download here: https://www.dropbox.com/s/6tyoh4vxb3nffoi/osvr_palace_build.zip?dl=0
 
-# Installation instructions:
+# Instructions for running the Unity executable:
 1) Download the latest 32-bit version of the OSVR-Core Snapshot: http://access.osvr.com/binary/osvr-core
 
 Current source version for this example: v0.2-5-g1d72171
