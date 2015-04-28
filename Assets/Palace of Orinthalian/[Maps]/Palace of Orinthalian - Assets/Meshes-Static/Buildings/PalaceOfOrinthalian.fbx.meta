@@ -1,0 +1,156 @@
+fileFormatVersion: 2
+guid: 0bbb04ba5bb054924ac835769e1496d5
+ModelImporter:
+  serializedVersion: 16
+  fileIDToRecycleName:
+    100000: //RootNode
+    100002: PoO_ArchWays
+    100004: 'PoO_Columns '
+    100006: PoO_HiddenStairs
+    100008: PoO_Platform
+    100010: PoO_RoughWoodenPlanks
+    100012: PoO_SupportBeams
+    100014: PoO_WallsLower
+    100016: PoO_WallsUpper
+    100018: PoO_WoodenRoof
+    100020: PoO_WoodSupports
+    100022: PoO_Cauldron
+    100024: PoO_Columns
+    100026: PoO_StoneWall_LOD0
+    100028: PoO_StoneWall_LOD1
+    100030: PoO_ArchColumns
+    400000: //RootNode
+    400002: PoO_ArchWays
+    400004: 'PoO_Columns '
+    400006: PoO_HiddenStairs
+    400008: PoO_Platform
+    400010: PoO_RoughWoodenPlanks
+    400012: PoO_SupportBeams
+    400014: PoO_WallsLower
+    400016: PoO_WallsUpper
+    400018: PoO_WoodenRoof
+    400020: PoO_WoodSupports
+    400022: PoO_Cauldron
+    400024: PoO_Columns
+    400026: PoO_StoneWall_LOD0
+    400028: PoO_StoneWall_LOD1
+    400030: PoO_ArchColumns
+    2300000: PoO_ArchWays
+    2300002: 'PoO_Columns '
+    2300004: PoO_HiddenStairs
+    2300006: PoO_Platform
+    2300008: PoO_RoughWoodenPlanks
+    2300010: PoO_SupportBeams
+    2300012: PoO_WallsLower
+    2300014: PoO_WallsUpper
+    2300016: PoO_WoodenRoof
+    2300018: PoO_WoodSupports
+    2300020: PoO_Cauldron
+    2300022: PoO_Columns
+    2300024: PoO_StoneWall_LOD0
+    2300026: PoO_StoneWall_LOD1
+    2300028: PoO_ArchColumns
+    3300000: PoO_ArchWays
+    3300002: 'PoO_Columns '
+    3300004: PoO_HiddenStairs
+    3300006: PoO_Platform
+    3300008: PoO_RoughWoodenPlanks
+    3300010: PoO_SupportBeams
+    3300012: PoO_WallsLower
+    3300014: PoO_WallsUpper
+    3300016: PoO_WoodenRoof
+    3300018: PoO_WoodSupports
+    3300020: PoO_Cauldron
+    3300022: PoO_Columns
+    3300024: PoO_StoneWall_LOD0
+    3300026: PoO_StoneWall_LOD1
+    3300028: PoO_ArchColumns
+    4300000: PoO_WoodenRoof
+    4300002: PoO_RoughWoodenPlanks
+    4300004: PoO_WallsUpper
+    4300006: PoO_Platform
+    4300008: PoO_HiddenStairs
+    4300010: PoO_WallsLower
+    4300012: PoO_WoodSupports
+    4300014: 'PoO_Columns '
+    4300016: PoO_SupportBeams
+    4300018: PoO_ArchWays
+    4300020: PoO_Cauldron
+    4300022: PoO_StoneWall_LOD0
+    4300024: PoO_Columns
+    4300026: PoO_StoneWall_LOD1
+    4300028: PoO_ArchColumns
+    6400000: PoO_ArchWays
+    6400002: 'PoO_Columns '
+    6400004: PoO_HiddenStairs
+    6400006: PoO_Platform
+    6400008: PoO_RoughWoodenPlanks
+    6400010: PoO_SupportBeams
+    6400012: PoO_WallsLower
+    6400014: PoO_WallsUpper
+    6400016: PoO_WoodenRoof
+    6400018: PoO_WoodSupports
+    6400020: PoO_Cauldron
+    6400022: PoO_Columns
+    6400024: PoO_StoneWall_LOD0
+    6400026: PoO_StoneWall_LOD1
+    6400028: PoO_ArchColumns
+    7400000: modo_Anim
+    9500000: //RootNode
+    20500000: //RootNode
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationCompression: 1
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages:
+    - .25
+    - .00999999978
+    globalScale: .00999999978
+    meshCompression: 0
+    addColliders: 1
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+  tangentSpace:
+    normalSmoothAngle: 45
+    splitTangentsAcrossUV: 1
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: 
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  additionalBone: 1
+  userData: 
