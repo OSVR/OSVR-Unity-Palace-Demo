@@ -13,4 +13,11 @@ Newer Core versions will probably work, but versions below v0.2 won't work. I wi
 osvr_server.exe -- this must be running for OSVR to work.
 osvr_server_config.json -- this must be configured for your device. By default it will work with the HDK. See included examples in the bin and share folders.
 
+3) Make sure your device is plugged into USB and start osvr_server.exe.
+
+Example for Sensics dSight:
+Copy the contents of osvr_server_config.dSight.json into osvr_server_config.json.
+Start osvr_server.exe
+Start Unity app osvr_palace.exe
+
 
