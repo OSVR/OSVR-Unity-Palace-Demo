@@ -105,7 +105,7 @@ public class DeviceDescriptor
         get { return _videoInputs; }
         set { _videoInputs = value; }
     }
-    private string _displayMode = "horzSideBySide";
+    private string _displayMode = "horz_side_by_side";
     public string DisplayMode
     {
         get { return _displayMode; }
@@ -117,7 +117,7 @@ public class DeviceDescriptor
         get { return _swapEyes; }
         set { _swapEyes = value; }
     }
-    
+
     //distortion
     private float _k1Red = 0;
     public float K1Red
@@ -172,7 +172,7 @@ public class DeviceDescriptor
 
     //constructors
     public DeviceDescriptor() { }
-    public DeviceDescriptor(string vendor, string model, string version, int numDisplays, string note, float monocularHorizontal, 
+    public DeviceDescriptor(string vendor, string model, string version, int numDisplays, string note, float monocularHorizontal,
         float monocularVertical, float overlapPercent, float pitchTilt, int width, int height, int videoInputs, string displayMode, int swapEyes,
         float k1Red, float k1Green, float k1Blue, float leftRoll, float rightRoll, float centerProjX, float centerProjY, int rotate180)
     {
@@ -209,30 +209,30 @@ public class DeviceDescriptor
         .Append("vendor = ").AppendLine(Vendor)
         .Append("model = ").AppendLine(Model)
         .Append("version = ").AppendLine(Version)
-        .Append("numDisplays = ").AppendLine(NumDisplays.ToString())
+        .Append("num_displays = ").AppendLine(NumDisplays.ToString())
         .Append("notes = ").AppendLine(Note)
         .Append("\nFIELD OF VIEW\n")
-        .Append("monocularHorizontal = ").AppendLine(MonocularHorizontal.ToString())
-        .Append("monocularVertical = ").AppendLine(MonocularVertical.ToString())
-        .Append("overlapPercent = ").AppendLine(OverlapPercent.ToString())
-        .Append("pitchTilt = ").AppendLine(PitchTilt.ToString())
+        .Append("monocular_horizontal = ").AppendLine(MonocularHorizontal.ToString())
+        .Append("monocular_vertical = ").AppendLine(MonocularVertical.ToString())
+        .Append("overlap_percent = ").AppendLine(OverlapPercent.ToString())
+        .Append("pitch_tilt = ").AppendLine(PitchTilt.ToString())
         .Append("\nRESOLUTION\n")
         .Append("width = ").AppendLine(Width.ToString())
         .Append("height = ").AppendLine(Height.ToString())
-        .Append("videoInputs = ").AppendLine(VideoInputs.ToString())
-        .Append("displayMode = ").AppendLine(DisplayMode)
+        .Append("video_inputs = ").AppendLine(VideoInputs.ToString())
+        .Append("display_mode = ").AppendLine(DisplayMode)
         .Append("swapEyes = ").AppendLine(SwapEyes.ToString())
         .Append("\nDISTORTION\n")
-        .Append("k1Red = ").AppendLine(K1Red.ToString())
-        .Append("k1Green = ").AppendLine(K1Green.ToString())
-        .Append("k1Blue = ").AppendLine(K1Blue.ToString())
+        .Append("k1_red = ").AppendLine(K1Red.ToString())
+        .Append("k1_green = ").AppendLine(K1Green.ToString())
+        .Append("k1_blue = ").AppendLine(K1Blue.ToString())
         .Append("\nRENDERING\n")
-        .Append("leftRoll = ").AppendLine(LeftRoll.ToString())
-        .Append("rightRoll = ").AppendLine(RightRoll.ToString())
+        .Append("left_roll = ").AppendLine(LeftRoll.ToString())
+        .Append("right_roll = ").AppendLine(RightRoll.ToString())
         .Append("\nEYES\n")
-        .Append("centerProjX = ").AppendLine(CenterProjX.ToString())
-        .Append("centerProjY = ").AppendLine(CenterProjY.ToString())
-        .Append("rotate180 = ").AppendLine(Rotate180.ToString());
+        .Append("center_proj_x = ").AppendLine(CenterProjX.ToString())
+        .Append("center_proj_y = ").AppendLine(CenterProjY.ToString())
+        .Append("rotate_180 = ").AppendLine(Rotate180.ToString());
         return jsonPrinter.ToString();
     }
 
@@ -281,22 +281,22 @@ public class DeviceDescriptor
                     case "version":
                         deviceDescriptor.Version = reader.ReadAsString();
                         break;
-                    case "numdisplays":
+                    case "num_displays":
                         deviceDescriptor.NumDisplays = int.Parse(reader.ReadAsString());
                         break;
                     case "note":
                         deviceDescriptor.Note = reader.ReadAsString();
                         break;
-                    case "monocularhorizontal":
+                    case "monocular_horizontal":
                         deviceDescriptor.MonocularHorizontal = float.Parse(reader.ReadAsString());
                         break;
-                    case "monocularvertical":
+                    case "monocular_vertical":
                         deviceDescriptor.MonocularVertical = float.Parse(reader.ReadAsString());
                         break;
-                    case "overlappercent":
+                    case "overlap_percent":
                         deviceDescriptor.OverlapPercent = float.Parse(reader.ReadAsString());
                         break;
-                    case "pitchtilt":
+                    case "pitch_tilt":
                         deviceDescriptor.PitchTilt = float.Parse(reader.ReadAsString());
                         break;
                     case "width":
@@ -305,37 +305,37 @@ public class DeviceDescriptor
                     case "height":
                         deviceDescriptor.Height = int.Parse(reader.ReadAsString());
                         break;
-                    case "videoinputs":
+                    case "video_inputs":
                         deviceDescriptor.VideoInputs = int.Parse(reader.ReadAsString());
                         break;
-                    case "displaymode":
+                    case "display_mode":
                         deviceDescriptor.DisplayMode = reader.ReadAsString();
                         break;
                     case "swapeyes":
                         deviceDescriptor.SwapEyes = int.Parse(reader.ReadAsString());
                         break;
-                    case "k1red":
+                    case "k1_red":
                         deviceDescriptor.K1Red = float.Parse(reader.ReadAsString());
                         break;
-                    case "k1green":
+                    case "k1_green":
                         deviceDescriptor.K1Green = float.Parse(reader.ReadAsString());
                         break;
-                    case "k1blue":
+                    case "k1_blue":
                         deviceDescriptor.K1Blue = float.Parse(reader.ReadAsString());
                         break;
-                    case "rightroll":
+                    case "right_roll":
                         deviceDescriptor.RightRoll = float.Parse(reader.ReadAsString());
                         break;
-                    case "leftroll":
+                    case "left_roll":
                         deviceDescriptor.LeftRoll = float.Parse(reader.ReadAsString());
                         break;
-                    case "centerprojx":
+                    case "center_proj_x":
                         deviceDescriptor.CenterProjX = float.Parse(reader.ReadAsString());
                         break;
-                    case "centerprojy":
+                    case "center_proj_y":
                         deviceDescriptor.CenterProjY = float.Parse(reader.ReadAsString());
                         break;
-                    case "rotate180":
+                    case "rotate_180":
                         deviceDescriptor.Rotate180 = int.Parse(reader.ReadAsString());
                         break;
                 }
