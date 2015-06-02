@@ -3,6 +3,10 @@ A simple example OSVR Unity project. Built with Unity 4.6. Upgrading to 5 is sea
 
 If you want the executable, download here: https://www.dropbox.com/s/nu3pzuj5zhxyk5y/osvr_palace.zip?dl=0
 
+This project should work on HMDs with multiple displays, such as the Sensics dSight. You may need to tweak the Build Settings.
+This link has all the information you need in order to build a Unity project to render across multiple displays: http://answers.unity3d.com/questions/309819/getting-unity-to-render-across-multiple-monitors.html
+Here is a working executable for the dSight: https://www.dropbox.com/s/w49hig5uo9z002n/osvr_palace_wide.zip?dl=0
+
 # Instructions for running the Unity executable:
 1) Download the latest 32-bit version of the OSVR-Core Snapshot: http://access.osvr.com/binary/osvr-core
 

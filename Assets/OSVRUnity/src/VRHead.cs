@@ -275,8 +275,19 @@ namespace OSVR
             //Set the Screen Resolution
             private void SetResolution(int width, int height)
             {
-                //set the resolution, default to full screen
-                Screen.SetResolution(width, height, true);
+                if(_deviceDescriptor.NumDisplays == 2)
+                {
+                    //support HMDs with multiple displays
+                    //if supporting a device with multiple displays like the Sensics dSight, changes to build settings may be required
+                    //http://answers.unity3d.com/questions/309819/getting-unity-to-render-across-multiple-monitors.html
+                    Screen.SetResolution(width*2, height, false);
+                }
+                else 
+                {
+                    //set the resolution, default to full screen
+                    Screen.SetResolution(width, height, true);
+                }
+                
 #if UNITY_EDITOR
                 UnityEditor.PlayerSettings.defaultScreenWidth = width;
                 UnityEditor.PlayerSettings.defaultScreenHeight = height;
