@@ -6,7 +6,7 @@ SubstanceImporter:
   - serializedVersion: 12
     name: sd_PoO_Pavers
     prototypeName: sd_PoO_Pavers
-    shader: {fileID: 4, guid: 0000000000000000f000000000000000, type: 0}
+    shader: {fileID: 10704, guid: 0000000000000000f000000000000000, type: 0}
     inputs:
     - name: $outputsize
       value:
@@ -75,12 +75,12 @@ SubstanceImporter:
     - name: sd_PoO_Pavers_Normal
       alphaSource: 0
       filterMode: 1
-      aniso: 1
+      aniso: 16
       wrapMode: 0
     - name: sd_PoO_Pavers_Diffuse
       alphaSource: 5
       filterMode: 1
-      aniso: 1
+      aniso: 16
       wrapMode: 0
     - name: sd_PoO_Pavers_Specular
       alphaSource: 0

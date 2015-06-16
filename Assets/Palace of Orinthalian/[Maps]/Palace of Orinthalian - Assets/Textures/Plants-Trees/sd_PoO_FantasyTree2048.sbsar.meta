@@ -6,7 +6,7 @@ SubstanceImporter:
   - serializedVersion: 12
     name: sd_PoO_FantasyTree
     prototypeName: sd_PoO_FantasyTree
-    shader: {fileID: 9, guid: 0000000000000000f000000000000000, type: 0}
+    shader: {fileID: 10704, guid: 0000000000000000f000000000000000, type: 0}
     inputs:
     - name: $outputsize
       value:
@@ -49,13 +49,6 @@ SubstanceImporter:
         data:
           first:
             name: _BumpMap
-          second:
-            texture: {instanceID: 0}
-            scale: {x: 1, y: 1}
-            offset: {x: 0, y: 0}
-        data:
-          first:
-            name: _ParallaxMap
           second:
             texture: {instanceID: 0}
             scale: {x: 1, y: 1}
@@ -108,10 +101,6 @@ SubstanceImporter:
         name: _BumpMap
       material: {instanceID: 0}
       baseUID: 870434189
-    - shaderProp:
-        name: _ParallaxMap
-      material: {instanceID: 0}
-      baseUID: 870448013
     buildTargetSettings:
     - serializedVersion: 2
       buildTarget: 

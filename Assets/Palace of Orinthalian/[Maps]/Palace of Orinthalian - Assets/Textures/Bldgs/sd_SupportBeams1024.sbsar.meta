@@ -6,7 +6,7 @@ SubstanceImporter:
   - serializedVersion: 12
     name: sd_SupportBeams
     prototypeName: sd_SupportBeams
-    shader: {fileID: 4, guid: 0000000000000000f000000000000000, type: 0}
+    shader: {fileID: 10704, guid: 0000000000000000f000000000000000, type: 0}
     inputs:
     - name: $outputsize
       value:
@@ -71,7 +71,7 @@ SubstanceImporter:
     - name: sd_SupportBeams_Normal
       alphaSource: 0
       filterMode: 1
-      aniso: 1
+      aniso: 16
       wrapMode: 0
     - name: sd_SupportBeams_Specular
       alphaSource: 0
@@ -81,7 +81,7 @@ SubstanceImporter:
     - name: sd_SupportBeams_Diffuse
       alphaSource: 5
       filterMode: 1
-      aniso: 1
+      aniso: 16
       wrapMode: 0
     - name: sd_SupportBeams_Output
       alphaSource: 0

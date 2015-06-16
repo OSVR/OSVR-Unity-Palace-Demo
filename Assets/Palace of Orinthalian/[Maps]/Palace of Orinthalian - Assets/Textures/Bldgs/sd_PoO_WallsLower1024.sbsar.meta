@@ -6,7 +6,7 @@ SubstanceImporter:
   - serializedVersion: 12
     name: PoO_WallsLower
     prototypeName: PoO_WallsLower
-    shader: {fileID: 4, guid: 0000000000000000f000000000000000, type: 0}
+    shader: {fileID: 10704, guid: 0000000000000000f000000000000000, type: 0}
     inputs:
     - name: $outputsize
       value:
@@ -57,7 +57,7 @@ SubstanceImporter:
         data:
           first:
             name: _Shininess
-          second: .595416903
+          second: .625741839
       colors:
         data:
           first:
@@ -71,7 +71,7 @@ SubstanceImporter:
     - name: PoO_WallsLower_Diffuse
       alphaSource: 5
       filterMode: 1
-      aniso: 1
+      aniso: 16
       wrapMode: 0
     - name: PoO_WallsLower_Specular
       alphaSource: 0
@@ -81,7 +81,7 @@ SubstanceImporter:
     - name: PoO_WallsLower_Normal
       alphaSource: 0
       filterMode: 1
-      aniso: 1
+      aniso: 16
       wrapMode: 0
     textureAssignments:
     - shaderProp:
