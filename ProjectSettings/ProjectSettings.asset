@@ -93,7 +93,7 @@ PlayerSettings:
   uIStatusBarHidden: 1
   uIExitOnSuspend: 0
   uIStatusBarStyle: 0
-  iPhoneSplashScreen: {fileID: 0}
+  iPhoneSplashScreen: {fileID: 2800000, guid: 5a4f2f3ef7a196144a5cda1942eee9b5, type: 3}
   iPhoneHighResSplashScreen: {fileID: 0}
   iPhoneTallHighResSplashScreen: {fileID: 0}
   iPhone47inSplashScreen: {fileID: 0}
@@ -120,7 +120,7 @@ PlayerSettings:
   m_BuildTargetIcons:
   - m_BuildTarget: 
     m_Icons:
-    - m_Icon: {fileID: 2800000, guid: ad145e99fa21e604bb2b02644fab6b18, type: 3}
+    - m_Icon: {fileID: 2800000, guid: 3cf4d46fd04016d49b0ddb7ce4f2dbf6, type: 3}
       m_Size: 128
   m_BuildTargetBatching:
   - m_BuildTarget: Android
