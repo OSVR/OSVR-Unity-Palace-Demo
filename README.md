@@ -16,7 +16,9 @@ This demo uses the Unity Palace project with a build of the OSVR-Android server 
 ##Very Helpful Apps
 
 [SuperSU](https://play.google.com/store/apps/details?id=eu.chainfire.supersu&hl=en)
+
 [BusyBox](https://play.google.com/store/apps/details?id=stericson.busybox&hl=en)
+
 [Rooted SSH/SFTP Daemon](https://play.google.com/store/apps/details?id=web.oss.sshsftpDaemon&hl=en)
 
 
