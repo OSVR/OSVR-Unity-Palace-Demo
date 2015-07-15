@@ -21,6 +21,8 @@ This demo uses the Unity Palace project with a build of the OSVR-Android server 
 
 [Rooted SSH/SFTP Daemon](https://play.google.com/store/apps/details?id=web.oss.sshsftpDaemon&hl=en)
 
+[Terminal Emulator for Android](https://play.google.com/store/apps/details?id=jackpal.androidterm&hl=en)
+
 
 ##Instructions
 
@@ -32,9 +34,17 @@ adb push C:\path\to\OSVR-Android-Server /data/local/tmp
 
 You might want to zip the folder and push the zip instead, then unzip on the device using the unzip command made available by BusyBox.
 
-3) Open an SSH connection with the device. Any client will do (PuTTY, for example). You'll need to run an SSH server on the device with the Rooted SSH/SFTP Daemon or similar app. You'll have to setup your SSH connection with the information in the app.
+3) You have two options for this step:
 
-4) Once you are connected, make sure you have root permissions with the command "su". Then navigate to the folder where you pushed the server, and run the setup script:
+OPTION 1 -- use Terminal Emulator for Android
+
+- Open the terminal emulator app.
+
+OPTION 2 -- use Rooted SSH/SFTP Daemon app
+
+- Open an SSH connection with the device. Any client will do (PuTTY, for example). You'll need to run an SSH server on the device with the Rooted SSH/SFTP Daemon or similar app. You'll have to setup your SSH connection with the information in the app.
+
+4) Make sure you have root permissions with the command "su". Then navigate to the folder where you pushed the server, and run the setup script:
 
 su (if you don't already have root privileges)
 cd /data/local/tmp/OSVR-Android-Server (or to the parent directory if you need to unzip)
