@@ -2,9 +2,9 @@
 
 Project source hosted at: https://github.com/OSVR/OSVR-Unity-Palace-Demo
 
-1) Download the latest 32-bit version of the [OSVR-Core Snapshot](http://access.osvr.com/binary/osvr-core)
+This demo uses OSVR-Unity.unitypackage v0.2.32-gcb1b5d8
 
-Source version for this example: v0.2-139
+1) Requires a recent build of [OSVR-Core](http://access.osvr.com/binary/osvr-core). Last tested with OSVR-Core v0.2.299-gd5b68a9.
 
 2) In the OSVR-Core Snapshot download, navigate to the bin folder to find:
 
