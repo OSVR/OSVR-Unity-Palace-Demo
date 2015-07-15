@@ -54,6 +54,7 @@ namespace OSVR
             private Camera _camera;
             private DeviceDescriptor _deviceDescriptor;
             private OsvrDistortion _distortionEffect;
+            private DisplayInterface _displayInterface;
             private bool _initDisplayInterface = false;
             #endregion
 
@@ -68,27 +69,30 @@ namespace OSVR
                     _distortionEffect.enabled = (viewMode == ViewMode.mono);
                 }
 
+                _displayInterface = GetComponent<DisplayInterface>();
+
                 //update VRHead with info from the display interface if it has been initialized
                 //it might not be initialized if it is still parsing a display json file
                 //in that case, we will try to initialize asap in the update function
-                if (GetComponent<DisplayInterface>().Initialized)
+                if (_displayInterface != null && _displayInterface.Initialized)
                 {
                     UpdateDisplayInterface();                  
-                }              
+                }
+                //else initialize in Update() 
             }         
             #endregion
 
             #region Loop
             void Update()
             {
-                
-                if(!_initDisplayInterface && !GetComponent<DisplayInterface>().Initialized)
+
+                if (!_initDisplayInterface && !_displayInterface.Initialized)
                 {
                     //if the display configuration hasn't initialized, ping the DisplayInterface to retrieve it from the ClientKit
                     //this would mean DisplayInterface was unable to retrieve that data in its Start() function.
-                    GetComponent<DisplayInterface>().ReadDisplayPath();
+                    _displayInterface.ReadDisplayPath();
                 }
-                else if (!_initDisplayInterface && GetComponent<DisplayInterface>().Initialized)
+                else if (!_initDisplayInterface && _displayInterface.Initialized)
                 {
                     //once the DisplayInterface has initialized, meaning it has read data from the /display path which contains
                     //display configuration, update the Camera and other settings with properties from the display configuration.
@@ -207,16 +211,16 @@ namespace OSVR
             /// </summary>
             private void GetDeviceDescription()
             {
-                _deviceDescriptor = GetComponent<DisplayInterface>().GetDeviceDescription();
+                _deviceDescriptor = _displayInterface.GetDeviceDescription();
                 if (_deviceDescriptor != null)
                 {
                     switch (_deviceDescriptor.DisplayMode)
                     {
-                        case "fullScreen":
+                        case "full_screen":
                             viewMode = ViewMode.mono;
                             break;
-                        case "horzSideBySide":
-                        case "vertSideBySide":
+                        case "horz_side_by_side":
+                        case "vert_side_by_side":
                         default:
                             viewMode = ViewMode.stereo;
                             break;
@@ -275,19 +279,8 @@ namespace OSVR
             //Set the Screen Resolution
             private void SetResolution(int width, int height)
             {
-                if(_deviceDescriptor.NumDisplays == 2)
-                {
-                    //support HMDs with multiple displays
-                    //if supporting a device with multiple displays like the Sensics dSight, changes to build settings may be required
-                    //http://answers.unity3d.com/questions/309819/getting-unity-to-render-across-multiple-monitors.html
-                    Screen.SetResolution(width*2, height, false);
-                }
-                else 
-                {
-                    //set the resolution, default to full screen
-                    Screen.SetResolution(width, height, true);
-                }
-                
+                //set the resolution, default to full screen
+                Screen.SetResolution(width, height, true);
 #if UNITY_EDITOR
                 UnityEditor.PlayerSettings.defaultScreenWidth = width;
                 UnityEditor.PlayerSettings.defaultScreenHeight = height;
