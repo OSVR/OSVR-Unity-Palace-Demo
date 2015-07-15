@@ -117,7 +117,7 @@ public class DeviceDescriptor
         get { return _swapEyes; }
         set { _swapEyes = value; }
     }
-
+    
     //distortion
     private float _k1Red = 0;
     public float K1Red
@@ -172,7 +172,7 @@ public class DeviceDescriptor
 
     //constructors
     public DeviceDescriptor() { }
-    public DeviceDescriptor(string vendor, string model, string version, int numDisplays, string note, float monocularHorizontal,
+    public DeviceDescriptor(string vendor, string model, string version, int numDisplays, string note, float monocularHorizontal, 
         float monocularVertical, float overlapPercent, float pitchTilt, int width, int height, int videoInputs, string displayMode, int swapEyes,
         float k1Red, float k1Green, float k1Blue, float leftRoll, float rightRoll, float centerProjX, float centerProjY, int rotate180)
     {
