@@ -30,7 +30,7 @@ namespace OSVR
 {
     namespace Unity
     {
-        
+
         public enum Eye { left, right };
 
         public class VREye : MonoBehaviour
@@ -38,13 +38,31 @@ namespace OSVR
             #region Private Variables
             private Camera _camera;
             private ClientKit clientKit;
+            private K1RadialDistortion _distortionEffect;
             #endregion
             #region Public Variables
             public Eye eye;
             public Camera Camera { get { return _camera; } set { _camera = value; } }
             [HideInInspector]
             public Transform cachedTransform;
-            
+            [HideInInspector]
+            public VRHead head;
+            [HideInInspector]
+            public K1RadialDistortion DistortionEffect
+            {
+              get
+              {
+                if (!_distortionEffect)
+                {
+                  _distortionEffect = GetComponent<K1RadialDistortion>();
+                }
+                return _distortionEffect;
+              }
+              set
+              {
+                _distortionEffect = value;
+              }
+            }
             #endregion
 
             #region Init
@@ -58,28 +76,8 @@ namespace OSVR
             public void MatchCamera(Camera sourceCamera)
             {
                 Camera.CopyFrom(sourceCamera);
-                //copy the distortion shader
-                CopyDistortionShader(sourceCamera.GetComponent<OsvrDistortion>(), this.gameObject);
                 SetViewportRects();
-                
-            }
-            //this function copies the distortion shader from the original Shader attached to VRHead
-            private void CopyDistortionShader(OsvrDistortion original, GameObject destination)
-            {
-                //if there is no distortion, don't bother
-                if (original.k1Red == 0 && original.k1Green == 0 && original.k1Blue == 0)
-                {
-                    return;                    
-                }
-                OsvrDistortion d = destination.AddComponent<OsvrDistortion>();
-                d.distortionShader = original.distortionShader;
-                d.k1Red = original.k1Red;
-                d.k1Blue = original.k1Blue;
-                d.k1Green = original.k1Green;
-                d.leftCenter = original.leftCenter;
-                d.rightCenter = original.rightCenter;
-                d.fullCenter = original.fullCenter;
-                d.enabled = true;
+
             }
 
             //rotate each eye outward
@@ -100,6 +98,10 @@ namespace OSVR
                 if(clientKit == null)
                 {
                     clientKit = GameObject.FindObjectOfType<ClientKit>();
+                }
+                if (head == null)
+                {
+                    gameObject.GetComponentInParent<VRHead>();
                 }
                 //cache:
                 cachedTransform = transform;
@@ -134,16 +136,20 @@ namespace OSVR
                 }
             }
 
-            //Called after a camera finishes rendering the scene.
+            //Called before a camera renders the scene.
             //the goal here is to update the client often to make sure we have the most recent tracker data
             //this helps reduce latency
-            void OnPostRender()
+            void OnPreRender()
             {
                 clientKit.context.update();
+                if (head)
+                {
+                    head.UpdatePose();
+                }
             }
             #endregion
 
-            
+
         }
     }
 }

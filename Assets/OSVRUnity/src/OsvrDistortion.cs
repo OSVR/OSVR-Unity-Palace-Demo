@@ -18,49 +18,122 @@
 /// limitations under the License.
 /// </copyright>
 /// <summary>
-/// Based on Unity's (Pro Only) Image Effect: Fisheye.js
-/// Author: Greg Aring
+/// Author: Greg Aring, Ryan Pavlik
 /// Email: greg@sensics.com
 /// </summary>
 using UnityEngine;
-using System.Collections;
 
-[ExecuteInEditMode]
-[RequireComponent(typeof(Camera))]
-public class OsvrDistortion : OsvrPostEffectsBase {
-    public float k1Red = 0.5f;
-    public float k1Green = 0.5f;
-    public float k1Blue = 0.5f;
-    public Vector2 fullCenter = new Vector2(0.5f, 0.5f);
-    public Vector2 leftCenter = new Vector2(0.5f, 0.5f);
-    public Vector2 rightCenter = new Vector2(0.5f, 0.5f);
-    public Shader distortionShader = null;
+namespace OSVR.Unity
+{
+	[ExecuteInEditMode]
+	[RequireComponent(typeof(Camera))]
+	public class K1RadialDistortion : MonoBehaviour
+	{
+		public float k1Red = 0.0f;
+		public float k1Green = 0.0f;
+		public float k1Blue = 0.0f;
+		public Vector2 center = new Vector2(0.5f, 0.5f);
+		public Material DistortionMaterial;
 
-    private Material distortionMaterial = null;
-	
-	protected override bool CheckResources () {
+		private void OnRenderImage(RenderTexture source, RenderTexture destination)
+		{
+			DistortionMaterial.SetFloat("_K1_Red", k1Red);
+			DistortionMaterial.SetFloat("_K1_Green", k1Green);
+			DistortionMaterial.SetFloat("_K1_Blue", k1Blue);
+			DistortionMaterial.SetVector("_Center", center);
+			Graphics.Blit(source, destination, DistortionMaterial);
+		}
+	}
 
-        CheckSupport (false);
-        distortionMaterial = CheckShaderAndCreateMaterial(distortionShader,distortionMaterial);
-		
-        if(!isSupported)
-            ReportAutoDisable ();
-        return isSupported;			
-    }
+	public class K1RadialDistortionFactory
+	{
+		private const string ShaderName = "Osvr/OsvrDistortion";
 
-	
-    void OnRenderImage (RenderTexture source, RenderTexture destination) {
-        if(CheckResources()==false) {
-            Graphics.Blit (source, destination);
-            return;
-        }
+		public bool Supported
+		{
+			get;
+			private set;
+		}
 
-        distortionMaterial.SetFloat("_K1_Red", k1Red);
-        distortionMaterial.SetFloat ("_K1_Green", k1Green);
-        distortionMaterial.SetFloat ("_K1_Blue", k1Blue);
-        distortionMaterial.SetVector("_Full_Center", fullCenter);
-        distortionMaterial.SetVector("_Left_Center", leftCenter);
-        distortionMaterial.SetVector("_Right_Center", rightCenter);
-        Graphics.Blit (source, destination, distortionMaterial); 	
-    }
+		private Shader DistortionShader;
+
+		public K1RadialDistortionFactory()
+		{
+			Supported = DoSetup();
+			if (!Supported)
+			{
+				Debug.Log("Execution will proceed, but without shader-based distortion.");
+			}
+		}
+
+		/// <summary>
+		/// Creates a K1RadialDistortion effect and adds it as a component to the given eye, if possible.
+		/// </summary>
+		/// <param name="Eye">VREye to apply the effect to.</param>
+		/// <returns>K1RadialDistortion object for parameter setting, or null if not supported</returns>
+		public K1RadialDistortion GetOrCreateDistortion(OSVR.Unity.VREye eye)
+		{
+			K1RadialDistortion ret = eye.DistortionEffect;
+			if (!Supported)
+			{
+				if (ret)
+				{
+					// shouldn't be able to get here but...
+					ret.enabled = false;
+					ret = null;
+				}
+				return ret;
+			}
+			if (ret == null)
+			{
+				ret = eye.gameObject.AddComponent<K1RadialDistortion>();
+				eye.DistortionEffect = ret;
+				ret.hideFlags = HideFlags.HideAndDontSave;
+				ret.DistortionMaterial = new Material(DistortionShader);
+				if (!ret.DistortionMaterial)
+				{
+					/// weird error case, shouldn't get here.
+					Debug.LogWarning("Couldn't create material in OSVR distortion shader factory - shouldn't be able to happen!");
+					ret.enabled = false;
+					return null;
+				}
+				ret.DistortionMaterial.hideFlags = HideFlags.HideAndDontSave;
+			}
+			else
+			{
+				ret.enabled = (ret.DistortionMaterial != null);
+			}
+			return ret;
+		}
+
+		private bool DoSetup()
+		{
+			if (!IsMinimallyCompatible)
+			{
+				Debug.Log("OSVR distortion shader not compatible with this version of Unity: requires image effects and render textures (4.6 Pro or 5.x)");
+				return false;
+			}
+			DistortionShader = Shader.Find(ShaderName);
+			if (!DistortionShader)
+			{
+				Debug.Log("Could not find OSVR distortion shader '" + ShaderName + "' - must be in a Resource folder to be part of a build!");
+				return false;
+			}
+			if (!DistortionShader.isSupported)
+			{
+				Debug.Log("OSVR distortion shader found and loaded but not supported on this platform.");
+				DistortionShader = null;
+				return false;
+			}
+			return true;
+		}
+
+		private static bool IsMinimallyCompatible
+		{
+			get
+			{
+				return SystemInfo.supportsImageEffects && SystemInfo.supportsRenderTextures;
+			}
+		}
+	}
 }

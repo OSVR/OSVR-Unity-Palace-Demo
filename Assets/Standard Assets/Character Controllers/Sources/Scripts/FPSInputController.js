@@ -1,5 +1,6 @@
 private var motor : CharacterMotor;
 var camDirection : Transform;
+private var quit : boolean = false;
 
 // Use this for initialization
 function Awake () {
@@ -8,6 +9,11 @@ function Awake () {
 
 // Update is called once per frame
 function Update () {
+    if(Input.GetKeyDown(KeyCode.Escape) && quit == false)
+    {
+        quit = true;
+        Application.Quit();
+    }
     // Get the input vector from keyboard or analog stick
     var directionVector = Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
     if (directionVector != Vector3.zero) {
