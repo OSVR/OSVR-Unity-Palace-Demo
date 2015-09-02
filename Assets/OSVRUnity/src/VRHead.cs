@@ -53,9 +53,9 @@ namespace OSVR
             private ViewMode _previousViewMode;
             private Camera _camera;
             private DeviceDescriptor _deviceDescriptor;
-            private OsvrDistortion _distortionEffect;
             private DisplayInterface _displayInterface;
             private bool _initDisplayInterface = false;
+            private PoseInterface _poseIf;
             #endregion
 
             #region Init
@@ -63,13 +63,14 @@ namespace OSVR
             {
                 Init();
                 CatalogEyes();
-                _distortionEffect = GetComponent<OsvrDistortion>();
+/*
                 if (_distortionEffect != null)
                 {
                     _distortionEffect.enabled = (viewMode == ViewMode.mono);
                 }
-
+*/
                 _displayInterface = GetComponent<DisplayInterface>();
+                _poseIf = GetComponent<PoseInterface>();
 
                 //update VRHead with info from the display interface if it has been initialized
                 //it might not be initialized if it is still parsing a display json file
@@ -103,6 +104,12 @@ namespace OSVR
                     UpdateStereoAmount();
                     UpdateViewMode();
                 }
+            }
+            public void UpdatePose()
+            {
+                var state = _poseIf.Interface.GetState();
+                transform.localPosition = state.Value.Position;
+                transform.localRotation = state.Value.Rotation;
             }
             #endregion
 
@@ -166,6 +173,8 @@ namespace OSVR
                     switch (currentEye.eye)
                     {
                         case Eye.left:
+                            // Only need one eye to update the head.
+                            currentEye.head = this;
                             _leftEye = currentEye;
                             break;
 
@@ -258,22 +267,30 @@ namespace OSVR
 
             private void SetDistortion(float k1Red, float k1Green, float k1Blue, float centerProjX, float centerProjY)
             {
-                if(_distortionEffect != null)
+              SetDistortion(_leftEye, k1Red, k1Green, k1Blue, new Vector2(centerProjX, centerProjY));
+              SetDistortion(_rightEye, k1Red, k1Green, k1Blue, new Vector2(centerProjX, centerProjY));
+            }
+            private void SetDistortion(VREye eye, float k1Red, float k1Green, float k1Blue, Vector2 center)
+            {
+              // disable distortion if there is no distortion for this HMD
+              if (k1Red == 0 && k1Green == 0 && k1Blue == 0)
+              {
+                if (eye.DistortionEffect)
                 {
-                    //disable distortion if there is no distortion for this hmd
-                    if(k1Red == 0 && k1Green == 0 && k1Blue == 0)
-                    {
-                        _distortionEffect.enabled = false;
-                    }
-                    else
-                    {
-                        _distortionEffect.k1Red = k1Red;
-                        _distortionEffect.k1Green = k1Green;
-                        _distortionEffect.k1Blue = k1Blue;
-                        _distortionEffect.fullCenter = new Vector2(centerProjX, centerProjY);
-                    }
-                    
+                  eye.DistortionEffect.enabled = false;
                 }
+                return;
+              }
+              // Otherwise try to create distortion and set its parameters
+              var distortionFactory = new K1RadialDistortionFactory();
+              var effect = distortionFactory.GetOrCreateDistortion(eye);
+              if (effect)
+              {
+                effect.k1Red = k1Red;
+                effect.k1Green = k1Green;
+                effect.k1Blue = k1Blue;
+                effect.center = center;
+              }
             }
 
             //Set the Screen Resolution
