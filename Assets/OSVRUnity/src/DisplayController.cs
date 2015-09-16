@@ -75,6 +75,11 @@ namespace OSVR
             }          
             public VRViewer[] Viewers { get { return _viewers; } }           
             public uint ViewerCount { get { return _viewerCount; } }
+            public bool CheckDisplayStartup
+            { 
+                get { return _checkDisplayStartup; }
+                set { _checkDisplayStartup = value; }
+            }
 
             void Awake()
             {
