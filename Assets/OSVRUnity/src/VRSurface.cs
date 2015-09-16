@@ -115,11 +115,48 @@ namespace OSVR
                 }
             }
 
+            void OnPreRender()
+            {
+                //update the client
+                Eye.Viewer.DisplayController.UpdateClient();
+
+                //bail if we don't have a pose yet
+                if (!Eye.Viewer.DisplayController.CheckDisplayStartup)
+                {
+                    Eye.Viewer.DisplayController.CheckDisplayStartup = Eye.Viewer.DisplayController.DisplayConfig.CheckDisplayStartup();
+                    return;
+                }
+                //update viewer pose, VRViewer ensures this only happens once
+                if(!Eye.Viewer.UpdatedThisFrame)
+                {
+                    Eye.Viewer.UpdateViewerHeadPose(Eye.Viewer.DisplayController.DisplayConfig.GetViewerPose(Eye.Viewer.ViewerIndex));
+                }
+
+                //update client again
+                Eye.Viewer.DisplayController.UpdateClient();
+
+                //update eye pose
+                Eye.UpdateEyePose(Eye.Viewer.DisplayController.DisplayConfig.GetViewerEyePose(Eye.Viewer.ViewerIndex, (byte)Eye.EyeIndex));
+
+                //get viewport from ClientKit and set surface viewport
+                OSVR.ClientKit.Viewport viewport = Eye.Viewer.DisplayController.DisplayConfig.GetRelativeViewportForViewerEyeSurface(
+                    Eye.Viewer.ViewerIndex, (byte)Eye.EyeIndex, SurfaceIndex);
+
+                SetViewport(Math.ConvertViewport(viewport));
+
+                //get projection matrix from ClientKit and set surface projection matrix
+                OSVR.ClientKit.Matrix44f projMatrix = Eye.Viewer.DisplayController.DisplayConfig.GetProjectionMatrixForViewerEyeSurfacef(
+                    Eye.Viewer.ViewerIndex, (byte)Eye.EyeIndex, SurfaceIndex,
+                    Camera.nearClipPlane, Camera.farClipPlane, OSVR.ClientKit.MatrixConventionsFlags.ColMajor);
+
+                SetProjectionMatrix(Math.ConvertMatrix(projMatrix));
+            }
+
             //Render the camera
-            public void Render()
+            /*public void Render()
             {
                 _camera.Render();
-            }
+            }*/
         }
     }
 }
