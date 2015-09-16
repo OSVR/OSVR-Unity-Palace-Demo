@@ -209,7 +209,7 @@ namespace OSVR
                 _camera.enabled = false;
 
                 //for each viewer, update each eye, which will update each surface
-                for (uint viewerIndex = 0; viewerIndex < _viewerCount; viewerIndex++)
+               /* for (uint viewerIndex = 0; viewerIndex < _viewerCount; viewerIndex++)
                 {
                     VRViewer viewer = Viewers[viewerIndex];
 
@@ -229,7 +229,7 @@ namespace OSVR
                     {
                         _checkDisplayStartup = DisplayConfig.CheckDisplayStartup();
                     }
-                }       
+                }    */   
 
                 // Flag that we disabled the camera
                 _disabledCamera = true;
