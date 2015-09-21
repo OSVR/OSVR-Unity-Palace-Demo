@@ -2,7 +2,7 @@
 
 Project source hosted at: https://github.com/OSVR/OSVR-Unity-Palace-Demo
 
-This demo currently uses OSVR-Unity-v0.2-54-ge98758a-with-core-v0.2-656-ge285644-build171
+This demo currently uses OSVR-Unity-v0.2.122-g2ff3c40 (build number 187) with OSVR-Core v0.2.731-g9d5d431
 
 1) A recent build of [OSVR-Core](http://osvr.github.io/using/) is required to run this demo. Last tested with OSVR-Core v0.2-656-ge285644.
 
