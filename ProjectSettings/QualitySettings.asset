@@ -35,8 +35,8 @@ QualitySettings:
     shadowDistance: 20
     blendWeights: 2
     textureQuality: 0
-    anisotropicTextures: 0
-    antiAliasing: 0
+    anisotropicTextures: 1
+    antiAliasing: 2
     softParticles: 0
     softVegetation: 0
     vSyncCount: 0
@@ -55,7 +55,7 @@ QualitySettings:
     blendWeights: 2
     textureQuality: 0
     anisotropicTextures: 1
-    antiAliasing: 0
+    antiAliasing: 4
     softParticles: 0
     softVegetation: 0
     vSyncCount: 1

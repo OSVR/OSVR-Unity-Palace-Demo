@@ -1,58 +1,23 @@
-#OSVR-Android Palace Demo
+# OSVR-Unity Palace Demo
 
-This demo uses the Unity Palace project with a build of the OSVR-Android server to connect to an external tracker. It has been tested on a Galaxy Note 4 (Android 5.0.1) and HTC One (4.3) using the HDK and Hillcrest Labs' FSM-9 trackers connected via a USB OTG cable.
+Project source hosted at: https://github.com/OSVR/OSVR-Unity-Palace-Demo
 
-##What you need to run this:
+This demo currently uses OSVR-Unity-v0.2.122-g2ff3c40 (build number 187) with OSVR-Core v0.2.731-g9d5d431
 
-1) An Android device running at least 4.1 (Jelly Bean). It may work on older devices if you build the server for an older platform and the phone supports USB-OTG.
+1) A recent build of [OSVR-Core](http://osvr.github.io/using/) is required to run this demo. Last tested with OSVR-Core v0.2-656-ge285644.
 
-2) Root permissions.
+2) In the OSVR-Core Snapshot download, navigate to the bin folder to find:
 
-3) External tracker. If you're on a mobile device with one micro USB port, you'll need to connect a tracker to that port with a USB On-the-go cable and the device needs to support that capability. This requirement is not necessary if you are on a device such as the Razer Forge TV or Ouya and can connect a tracker via a USB port as you would on PC. This build has only been tested on the phones mentioned above. It does not use a phone's internal tracker.
+osvr_server.exe -- this must be running for OSVR to work.
 
-4) A build of the OSVR-Core server for Android (included with release). See [OSVR-Android-Build](https://github.com/OSVR/OSVR-Android-Build)
+osvr_server_config.json -- this must be configured for your device. By default it will work with the HDK. See included examples in the bin and share folders for other configurations.
 
+Add any [device plugins](http://osvr.github.io/using/) to the osvr-plugins-0 folder. 
 
-##Very Helpful Apps
+3) Connect your device to and start osvr_server.exe, not necessarily in that order.
 
-[SuperSU](https://play.google.com/store/apps/details?id=eu.chainfire.supersu&hl=en)
+#Android
+Here is an [Android apk](https://github.com/OSVR/OSVR-Unity-Palace-Demo/releases/tag/v0.1.1-android) built with this project.
 
-[BusyBox](https://play.google.com/store/apps/details?id=stericson.busybox&hl=en)
+See the [Android branch README](https://github.com/OSVR/OSVR-Unity-Palace-Demo/blob/androidPalace/README.md) for more information.
 
-[Rooted SSH/SFTP Daemon](https://play.google.com/store/apps/details?id=web.oss.sshsftpDaemon&hl=en)
-
-[Terminal Emulator for Android](https://play.google.com/store/apps/details?id=jackpal.androidterm&hl=en)
-
-
-##Instructions
-
-1) Root the device and install the helpful apps, and the demo apk.
-
-2) Push the OSVR-Android-Server folder onto the device. I used /data/local/tmp but there is probably a more logical place to put it. You can do this using adb while the device is connected to a PC via USB.
-
-adb push C:\path\to\OSVR-Android-Server /data/local/tmp
-
-You might want to zip the folder and push the zip instead, then unzip on the device using the unzip command made available by BusyBox.
-
-3) You have two options for this step:
-
-OPTION 1 -- use Terminal Emulator for Android
-
-- Open the terminal emulator app.
-
-OPTION 2 -- use Rooted SSH/SFTP Daemon app
-
-- Open an SSH connection with the device. Any client will do (PuTTY, for example). You'll need to run an SSH server on the device with the Rooted SSH/SFTP Daemon or similar app. You'll have to setup your SSH connection with the information in the app.
-
-4) Make sure you have root permissions with the command "su". Then navigate to the folder where you pushed the server, and run the setup script:
-
-su (if you don't already have root privileges)
-cd /data/local/tmp/OSVR-Android-Server (or to the parent directory if you need to unzip)
-sh setup.sh
-
-5) Connect an external tracker such as the HDK of FSM-9 with a USB OTG cable if you're using a phone, or by USB if the device supports it. The server is configured to work with the FSM-9 in this build.
-
-6) Start the server. Then start the Palace Demo app.
-./osvr_server
-
-That should do it! You can connect a bluetooth controller to walk around the environment.

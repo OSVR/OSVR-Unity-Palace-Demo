@@ -17,7 +17,7 @@ using System.Collections;
 [AddComponentMenu("Camera-Control/Mouse Look")]
 public class MouseLook : MonoBehaviour
 {
-
+    public bool useMouseLook = false;
     public enum RotationAxes { MouseXAndY = 0, MouseX = 1, MouseY = 2, RightJoystick = 3 }
     public RotationAxes axes = RotationAxes.MouseXAndY;
     public float sensitivityX = 15F;
@@ -30,9 +30,27 @@ public class MouseLook : MonoBehaviour
     public float maximumY = 60F;
 
     float rotationY = 0F;
+    private float lastMouseLookTime = 0;
+
+    void Start()
+    {
+        // Make the rigid body not change rotation
+        if (GetComponent<Rigidbody>())
+            GetComponent<Rigidbody>().freezeRotation = true;
+    }
 
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.M) && Time.time - lastMouseLookTime > 0.3f)
+        {
+            Debug.Log("M " + Time.time);
+            lastMouseLookTime = Time.time;
+            useMouseLook = !useMouseLook;
+        }
+        if(!useMouseLook)
+        {
+            return;
+        }
         if (axes == RotationAxes.MouseXAndY)
         {
             float rotationX = transform.localEulerAngles.y + Input.GetAxis("Mouse X") * sensitivityX;
@@ -56,12 +74,5 @@ public class MouseLook : MonoBehaviour
 
             transform.localEulerAngles = new Vector3(-rotationY, transform.localEulerAngles.y, 0);
         }
-    }
-
-    void Start()
-    {
-        // Make the rigid body not change rotation
-        if (GetComponent<Rigidbody>())
-            GetComponent<Rigidbody>().freezeRotation = true;
-    }
+    }    
 }
