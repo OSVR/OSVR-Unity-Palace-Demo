@@ -2,22 +2,18 @@
 
 Project source hosted at: https://github.com/OSVR/OSVR-Unity-Palace-Demo
 
-This demo currently uses OSVR-Unity-v0.2.122-g2ff3c40 (build number 187) with OSVR-Core v0.2.731-g9d5d431
+This demo currently uses OSVR-Unity-v0.6 (build number 206) with OSVR-Core v0.6
 
-1) A recent build of [OSVR-Core](http://osvr.github.io/using/) is required to run this demo. Last tested with OSVR-Core v0.2-656-ge285644.
+This demo has been tested on:
+LG G4 -- working
+Samsung Galaxy S6 -- working sometimes, black screen sometimes
 
-2) In the OSVR-Core Snapshot download, navigate to the bin folder to find:
+If you get a black screen, try restarting the server launcher app.
 
-osvr_server.exe -- this must be running for OSVR to work.
+#Installation
 
-osvr_server_config.json -- this must be configured for your device. By default it will work with the HDK. See included examples in the bin and share folders for other configurations.
+1) Install the OSVR-Android Server launcher: https://github.com/OSVR/OSVR-AndroidServerLauncher
+2) Run the OSVR Server Launcher app.
+3) Run the palace demo app.
 
-Add any [device plugins](http://osvr.github.io/using/) to the osvr-plugins-0 folder. 
-
-3) Connect your device to and start osvr_server.exe, not necessarily in that order.
-
-#Android
-Here is an [Android apk](https://github.com/OSVR/OSVR-Unity-Palace-Demo/releases/tag/v0.1.1-android) built with this project.
-
-See the [Android branch README](https://github.com/OSVR/OSVR-Unity-Palace-Demo/blob/androidPalace/README.md) for more information.
 
