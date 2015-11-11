@@ -36,6 +36,7 @@ namespace OSVR
             public VREye[] Eyes { get { return _eyes; } }
             public uint EyeCount { get { return _eyeCount; } }
             public uint ViewerIndex { get { return _viewerIndex; } set { _viewerIndex = value; } }
+            public bool UpdatedThisFrame { get { return _updatedThisFrame; } }
             [HideInInspector]
             public Transform cachedTransform;
             #endregion
@@ -45,6 +46,7 @@ namespace OSVR
             private VREye[] _eyes;
             private uint _eyeCount;
             private uint _viewerIndex;
+            private bool _updatedThisFrame = false;
 
             #endregion
 
@@ -81,12 +83,16 @@ namespace OSVR
             //Updates the position and rotation of the head
             public void UpdateViewerHeadPose(OSVR.ClientKit.Pose3 headPose)
             {
-                cachedTransform.localPosition = Math.ConvertPosition(headPose.translation);
-                cachedTransform.localRotation = Math.ConvertOrientation(headPose.rotation);
+                if (!_updatedThisFrame)
+                {
+                    _updatedThisFrame = true;
+                    cachedTransform.localPosition = Math.ConvertPosition(headPose.translation);
+                    cachedTransform.localRotation = Math.ConvertOrientation(headPose.rotation);
+                }
             }
 
             //Update the pose of each eye, then update and render each eye's surfaces
-            public void UpdateEyes()
+            /*public void UpdateEyes()
             {
                 for (uint eyeIndex = 0; eyeIndex < EyeCount; eyeIndex++)
                 {
@@ -100,7 +106,12 @@ namespace OSVR
                    //update the eye's surfaces, includes a call to Render the surface
                     eye.UpdateSurfaces();                   
                 }
-            }               
+            }*/
+            
+            void LateUpdate()
+            {
+                _updatedThisFrame = false;
+            }
         }
     }
 }

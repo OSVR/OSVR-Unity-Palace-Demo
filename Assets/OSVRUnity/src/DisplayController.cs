@@ -75,6 +75,11 @@ namespace OSVR
             }          
             public VRViewer[] Viewers { get { return _viewers; } }           
             public uint ViewerCount { get { return _viewerCount; } }
+            public bool CheckDisplayStartup
+            { 
+                get { return _checkDisplayStartup; }
+                set { _checkDisplayStartup = value; }
+            }
 
             void Awake()
             {
@@ -204,7 +209,7 @@ namespace OSVR
                 _camera.enabled = false;
 
                 //for each viewer, update each eye, which will update each surface
-                for (uint viewerIndex = 0; viewerIndex < _viewerCount; viewerIndex++)
+               /* for (uint viewerIndex = 0; viewerIndex < _viewerCount; viewerIndex++)
                 {
                     VRViewer viewer = Viewers[viewerIndex];
 
@@ -228,7 +233,7 @@ namespace OSVR
                             Debug.LogError("Display Startup failed. Check HMD connection.");
                         }
                     }
-                }       
+                }    */   
 
                 // Flag that we disabled the camera
                 _disabledCamera = true;

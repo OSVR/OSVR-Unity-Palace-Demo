@@ -85,7 +85,7 @@ namespace OSVR
             }
 
             //For each Surface, update viewing parameters and render the surface
-            public void UpdateSurfaces()
+           /* public void UpdateSurfaces()
             {
                 //for each surface
                 for (uint surfaceIndex = 0; surfaceIndex < SurfaceCount; surfaceIndex++)
@@ -109,7 +109,7 @@ namespace OSVR
                     //render the surface
                     surface.Render();
                 }
-            }
+            }*/
 
             //Create this Eye's VRSurfaces. 
             //Each VRSurface has a camera component which controls rendering for the VREye
@@ -132,7 +132,7 @@ namespace OSVR
                     surface.Eye = this;
                     surface.Camera = surfaceGameObject.GetComponent<Camera>(); //VRSurface has camera component by default
                     CopyCamera(Viewer.DisplayController.Camera, surface.Camera); //copy camera properties from the "dummy" camera to surface camera
-                    surface.Camera.enabled = false; //disabled so we can control rendering manually
+                    surface.Camera.enabled = true; //disabled so we can control rendering manually
                     surfaceGameObject.transform.parent = this.transform; //surface is child of Eye
                     surfaceGameObject.transform.localPosition = Vector3.zero;
                     Surfaces[surfaceIndex] = surface;
