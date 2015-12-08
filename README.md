@@ -18,6 +18,9 @@ Add any [device plugins](http://osvr.github.io/using/) to the osvr-plugins-0 fol
 
 3) Connect your device to and start osvr_server.exe, not necessarily in that order.
 
+# RenderManager / DirectMode
+The Plugins folder contains DLLs from RenderManager v0.25. You will need to install [RenderManager](http://osvr.github.io/using/) and run an appropriate configuration file to enable DirectMode. See the sample configs included in the latest release or in the RenderManager install directory.
+
 #Android
 Here is an [Android apk](https://github.com/OSVR/OSVR-Unity-Palace-Demo/releases/tag/v0.1.1-android) built with this project.
 
