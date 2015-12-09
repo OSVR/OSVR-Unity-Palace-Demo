@@ -244,11 +244,11 @@ namespace OSVR
 
                 //Set the resolution. Don't force fullscreen if we have multiple display inputs
                 //@todo figure out why this causes problems with direct mode, perhaps overfill factor?
-                if(numDisplayInputs > 1)
+                if (numDisplayInputs > 1 && !UseRenderManager)
                 {
                     Screen.SetResolution((int)TotalDisplayWidth, (int)TotalDisplayHeight, false);
-                }                             
-                
+                }
+
             }
 
             // Creates a head and eyes as configured in clientKit
