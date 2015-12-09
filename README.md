@@ -2,7 +2,7 @@
 
 Project source hosted at: https://github.com/OSVR/OSVR-Unity-Palace-Demo
 
-This demo currently uses OSVR-Unity-v0.6.1.7-gd46ead9 (build number 249) with OSVR-Core v0.6.428-gf10d9cb.
+This demo currently uses OSVR-Unity-v0.6.2.2-ga159d9d (build number 250) with OSVR-Core v0.6.428-gf10d9cb.
 
 This demo supports Direct Mode, Timewarp, and Distortion Correction via OSVR RenderManager. The DLLs are included in the Plugins folder. Direct Mode requires Unity 5.2+ and nVidia graphics cards (700 series or newer) with the latest drivers (359.0).
 
