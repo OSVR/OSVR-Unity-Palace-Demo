@@ -83,7 +83,9 @@ namespace OSVR
             public void UpdateEyePose(OSVR.ClientKit.Pose3 eyePose)
             { 
                 cachedTransform.localPosition = Math.ConvertPosition(eyePose.translation);
-                cachedTransform.localRotation = Viewer.DisplayController.UseRenderManager ? Math.ConvertOrientationFromRenderManager(eyePose.rotation) : Math.ConvertOrientation(eyePose.rotation);
+                //cachedTransform.localRotation = Viewer.DisplayController.UseRenderManager ? Math.ConvertOrientationFromRenderManager(eyePose.rotation) : Math.ConvertOrientation(eyePose.rotation);
+                //@todo use DisplayConfig path until RenderManager EyePose bug is fixed
+                cachedTransform.localRotation = Math.ConvertOrientation(eyePose.rotation);
             }
 
             //For each Surface, update viewing parameters and render the surface
@@ -106,6 +108,9 @@ namespace OSVR
 
                         //get projection matrix from RenderManager and set surface projection matrix
                         surface.SetProjectionMatrix(Viewer.DisplayController.RenderManager.GetEyeProjectionMatrix((int)EyeIndex));
+                   
+                        surface.Render();
+                        surface.SetActiveRenderTexture();
                     }
                     else
                     {
@@ -129,15 +134,6 @@ namespace OSVR
                         surface.Render();
                     }                           
 
-                    if(Viewer.DisplayController.UseRenderManager)
-                    {
-                        surface.Render();
-                        surface.SetActiveRenderTexture();
-                    }
-                    else
-                    {
-                        surface.Render();
-                    }
                 }
             }
 
@@ -173,8 +169,8 @@ namespace OSVR
                     VRSurface surface = surfaceGameObject.AddComponent<VRSurface>();
                     surface.Eye = this;
                     surface.Camera = surfaceGameObject.GetComponent<Camera>(); //VRSurface has camera component by default
-                    CopyCamera(Viewer.DisplayController.Camera, surface.Camera); //copy camera properties from the "dummy" camera to surface camera
-                    surface.Camera.enabled = !Viewer.DisplayController.UseRenderManager; //disabled so we can control rendering manually
+                    CopyCamera(Viewer.Camera, surface.Camera); //copy camera properties from the "dummy" camera to surface camera
+                    surface.Camera.enabled = false; //disabled so we can control rendering manually
                     surfaceGameObject.transform.parent = this.transform; //surface is child of Eye
                     surfaceGameObject.transform.localPosition = Vector3.zero;
                     Surfaces[surfaceIndex] = surface;
