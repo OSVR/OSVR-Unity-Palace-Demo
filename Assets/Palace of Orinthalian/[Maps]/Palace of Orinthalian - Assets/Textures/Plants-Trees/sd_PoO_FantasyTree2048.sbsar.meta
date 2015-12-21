@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: 87b8ad092c9114f138e2d04a4e94c3a1
-timeCreated: 1446750260
+timeCreated: 1450737996
 licenseType: Free
 SubstanceImporter:
   serializedVersion: 5
@@ -8,9 +8,9 @@ SubstanceImporter:
   - serializedVersion: 16
     name: sd_PoO_FantasyTree
     prototypeName: sd_PoO_FantasyTree
-    shader: {fileID: 45, guid: 0000000000000000f000000000000000, type: 0}
-    shaderKeywords: _NORMALMAP _PARALLAXMAP _SPECGLOSSMAP
-    renderQueue: -1
+    shader: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
+    shaderKeywords: _NORMALMAP _PARALLAXMAP
+    renderQueue: 2000
     lightmapFlags: 5
     inputs:
     - name: $outputsize
@@ -67,13 +67,6 @@ SubstanceImporter:
             offset: {x: 0, y: 0}
         data:
           first:
-            name: _SpecGlossMap
-          second:
-            texture: {instanceID: 0}
-            scale: {x: 1, y: 1}
-            offset: {x: 0, y: 0}
-        data:
-          first:
             name: _ParallaxMap
           second:
             texture: {instanceID: 0}
@@ -107,6 +100,13 @@ SubstanceImporter:
             texture: {instanceID: 0}
             scale: {x: 1, y: 1}
             offset: {x: 0, y: 0}
+        data:
+          first:
+            name: _MetallicGlossMap
+          second:
+            texture: {instanceID: 0}
+            scale: {x: 1, y: 1}
+            offset: {x: 0, y: 0}
       floats:
         data:
           first:
@@ -119,15 +119,15 @@ SubstanceImporter:
         data:
           first:
             name: _Cutoff
-          second: .5
+          second: 0.5
         data:
           first:
             name: _Shininess
-          second: .371487439
+          second: 0.37148744
         data:
           first:
             name: _Parallax
-          second: .00499999989
+          second: 0.005
         data:
           first:
             name: _ZWrite
@@ -135,7 +135,7 @@ SubstanceImporter:
         data:
           first:
             name: _Glossiness
-          second: .5
+          second: 0.5
         data:
           first:
             name: _BumpScale
@@ -156,6 +156,10 @@ SubstanceImporter:
           first:
             name: _Mode
           second: 0
+        data:
+          first:
+            name: _Metallic
+          second: 0
       colors:
         data:
           first:
@@ -164,11 +168,11 @@ SubstanceImporter:
         data:
           first:
             name: _Color
-          second: {r: .692896485, g: .685006618, b: .533071458, a: 1}
+          second: {r: 0.6928965, g: 0.6850066, b: 0.53307146, a: 1}
         data:
           first:
             name: _SpecColor
-          second: {r: .316056252, g: .272295535, b: .224865049, a: 1}
+          second: {r: 0.31605625, g: 0.27229553, b: 0.22486505, a: 1}
     textureParameters:
     - name: sd_PoO_FantasyTree_Diffuse
       alphaSource: 5
@@ -199,10 +203,6 @@ SubstanceImporter:
         name: _BumpMap
       material: {instanceID: 0}
       baseUID: 870434189
-    - shaderProp:
-        name: _SpecGlossMap
-      material: {instanceID: 0}
-      baseUID: 870434191
     - shaderProp:
         name: _ParallaxMap
       material: {instanceID: 0}
