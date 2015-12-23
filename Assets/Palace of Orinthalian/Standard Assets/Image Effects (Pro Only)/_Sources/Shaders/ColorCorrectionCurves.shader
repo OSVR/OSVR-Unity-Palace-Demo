@@ -16,18 +16,16 @@ Shader "Hidden/ColorCorrectionCurves" {
 	// Shader code pasted into all further CGPROGRAM blocks
 	CGINCLUDE
 
-	#pragma fragmentoption ARB_precision_hint_fastest
-	
 	#include "UnityCG.cginc"
 	
 	struct v2f {
-		float4 pos : POSITION;
+		float4 pos : SV_POSITION;
 		float2 uv  : TEXCOORD0;
 		float2 uv2 : TEXCOORD1;
 	};
 	 
 	sampler2D _MainTex;
-	sampler2D _CameraDepthTexture;
+	sampler2D_float _CameraDepthTexture;
 	
 	float4 _CameraDepthTexture_ST;
 	uniform float4 _MainTex_TexelSize;
@@ -53,7 +51,7 @@ Shader "Hidden/ColorCorrectionCurves" {
 		return o;
 	} 
 	
-	half4 frag(v2f i) : COLOR 
+	half4 frag(v2f i) : SV_Target 
 	{
 		half4 color = tex2D(_MainTex, i.uv); 
 
@@ -63,7 +61,7 @@ Shader "Hidden/ColorCorrectionCurves" {
 		half3 green = tex2D(_RgbTex, half2(color.g, ycoords.y)).rgb * half3(0,1,0);
 		half3 blue = tex2D(_RgbTex, half2(color.b, ycoords.z)).rgb * half3(0,0,1);
 		
-		half theDepth = UNITY_SAMPLE_DEPTH( tex2D (_CameraDepthTexture, i.uv2) );
+		half theDepth = SAMPLE_DEPTH_TEXTURE( _CameraDepthTexture, i.uv2) ;
 		half zval = tex2D(_ZCurve, half2( Linear01Depth (theDepth), 0.5));
 		
 		half3 depthRed = tex2D(_RgbDepthTex, half2(color.r, ycoords.x)).rgb * half3(1,0,0);
@@ -82,7 +80,6 @@ Shader "Hidden/ColorCorrectionCurves" {
 Subshader {
  Pass {
 	  ZTest Always Cull Off ZWrite Off
-	  Fog { Mode off }      
 
       CGPROGRAM
       #pragma vertex vert

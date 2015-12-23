@@ -10,19 +10,19 @@
 	#include "UnityCG.cginc"
 	
 	struct v2f {
-		float4 pos : POSITION;
+		float4 pos : SV_POSITION;
 		float2 uv : TEXCOORD0;
 		float2 uv1 : TEXCOORD1;
 	};
 
 	struct v2fRadius {
-		float4 pos : POSITION;
+		float4 pos : SV_POSITION;
 		float2 uv : TEXCOORD0;
 		float4 uv1[4] : TEXCOORD1;
 	};
 	
 	struct v2fBlur {
-		float4 pos : POSITION;
+		float4 pos : SV_POSITION;
 		float2 uv : TEXCOORD0;
 		float4 uv01 : TEXCOORD1;
 		float4 uv23 : TEXCOORD2;
@@ -32,7 +32,7 @@
 	};	
 	
 	uniform sampler2D _MainTex;
-	uniform sampler2D _CameraDepthTexture;
+	uniform sampler2D_float _CameraDepthTexture;
 	uniform sampler2D _FgOverlap;
 	uniform sampler2D _LowRez;
 	uniform float4 _CurveParams;
@@ -86,9 +86,9 @@
 
 	#define SCATTER_OVERLAP_SMOOTH (-0.265)
 
-	inline float BokehWeightDisc(float4 sample, float sampleDistance, float4 centerSample)
+	inline float BokehWeightDisc(float4 theSample, float sampleDistance, float4 centerSample)
 	{
-		return smoothstep(SCATTER_OVERLAP_SMOOTH, 0.0, sample.a - centerSample.a*sampleDistance); 
+		return smoothstep(SCATTER_OVERLAP_SMOOTH, 0.0, theSample.a - centerSample.a*sampleDistance); 
 	}
 
 	inline float2 BokehWeightDisc2(float4 sampleA, float4 sampleB, float2 sampleDistance2, float4 centerSample)
@@ -145,7 +145,7 @@
 		float3(-0.07214,0.60554,0.60982),
 	};	
 
-	float4 fragBlurInsaneMQ (v2f i) : COLOR 
+	float4 fragBlurInsaneMQ (v2f i) : SV_Target 
 	{
 		float4 centerTap = tex2D(_MainTex, i.uv1.xy);
 		float4 sum = centerTap;
@@ -175,7 +175,7 @@
 		return returnValue;
 	}		
 
-	float4 fragBlurInsaneHQ (v2f i) : COLOR 
+	float4 fragBlurInsaneHQ (v2f i) : SV_Target 
 	{
 		float4 centerTap = tex2D(_MainTex, i.uv1.xy);
 		float4 sum = centerTap;
@@ -219,7 +219,7 @@
 		return lerp(low, high, blend);
 	}
 
-	float4 fragBlurUpsampleCombineHQ (v2f i) : COLOR 
+	float4 fragBlurUpsampleCombineHQ (v2f i) : SV_Target 
 	{	
 		float4 bigBlur = tex2D(_LowRez, i.uv1.xy);
 		float4 centerTap = tex2D(_MainTex, i.uv1.xy);
@@ -245,7 +245,7 @@
 		return centerTap.a < 1e-2f ? centerTap : float4(smallBlur.rgb,centerTap.a);
 	}
 
-	float4 fragBlurUpsampleCombineMQ (v2f i) : COLOR 
+	float4 fragBlurUpsampleCombineMQ (v2f i) : SV_Target 
 	{			
 		float4 bigBlur = tex2D(_LowRez, i.uv1.xy);
 		float4 centerTap = tex2D(_MainTex, i.uv1.xy);
@@ -272,7 +272,7 @@
 		return centerTap.a < 1e-2f ? centerTap : float4(smallBlur.rgb,centerTap.a);
 	}	
 
-	float4 fragBlurUpsampleCheap (v2f i) : COLOR 
+	float4 fragBlurUpsampleCheap (v2f i) : SV_Target 
 	{			
 		float4 centerTap = tex2D(_MainTex, i.uv1.xy);
 		float4 bigBlur = tex2D(_LowRez, i.uv1.xy);
@@ -283,7 +283,7 @@
 		return float4(smallBlur.rgb, centerTap.a);
 	}	
 									
-	float4 fragBlurBox (v2f i) : COLOR 
+	float4 fragBlurBox (v2f i) : SV_Target 
 	{
 		const int TAPS = 12;
 
@@ -323,7 +323,7 @@
 	}		
 
 
-	float4 fragVisualize (v2f i) : COLOR 
+	float4 fragVisualize (v2f i) : SV_Target 
 	{
 		float4 returnValue = tex2D(_MainTex, i.uv1.xy);	
 		returnValue.rgb = lerp(float3(0.0,0.0,0.0), float3(1.0,1.0,1.0), saturate(returnValue.a/_CurveParams.x));
@@ -331,7 +331,7 @@
 	}
 
 
-	float4 fragBoxDownsample (v2f i) : COLOR 
+	float4 fragBoxDownsample (v2f i) : SV_Target 
 	{		
 		//float4 returnValue = tex2D(_MainTex, i.uv1.xy);			
 		float4 returnValue = tex2D(_MainTex, i.uv1.xy + 0.75*_MainTex_TexelSize.xy);
@@ -342,7 +342,7 @@
 		return returnValue/4;
 	}		
 
-	float4 fragBlurAlphaWeighted (v2fBlur i) : COLOR 
+	float4 fragBlurAlphaWeighted (v2fBlur i) : SV_Target 
 	{
 		const float ALPHA_WEIGHT = 2.0f;
 		float4 sum = float4 (0,0,0,0);
@@ -383,7 +383,7 @@
 		return sum;
 	}	
 	
-	float4 fragBlurForFgCoc (v2fBlur i) : COLOR 
+	float4 fragBlurForFgCoc (v2fBlur i) : SV_Target 
 	{
 		float4 sum = float4 (0,0,0,0);
 		float w = 0;
@@ -420,7 +420,7 @@
 		return sum;
 	}	
 
-	float4 fragGaussBlur (v2fBlur i) : COLOR 
+	float4 fragGaussBlur (v2fBlur i) : SV_Target 
 	{
 		float4 sum = float4 (0,0,0,0);
 		float w = 0;
@@ -457,7 +457,7 @@
 		return sum;
 	}
 
-	float4 frag4TapBlurForLRSpawn (v2f i) : COLOR 
+	float4 frag4TapBlurForLRSpawn (v2f i) : SV_Target 
 	{
 		float4 tap  =  tex2D(_MainTex, i.uv.xy);
 		
@@ -477,10 +477,10 @@
 		return outColor;
 	}
 
-	float4 fragCaptureColorAndSignedCoc (v2f i) : COLOR 
+	float4 fragCaptureColorAndSignedCoc (v2f i) : SV_Target 
 	{	
 		float4 color = tex2D (_MainTex, i.uv1.xy);
-		float d = UNITY_SAMPLE_DEPTH(tex2D(_CameraDepthTexture, i.uv1.xy));
+		float d = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv1.xy);
 		d = Linear01Depth (d);
 		color.a = _CurveParams.z * abs(d - _CurveParams.w) / (d + 1e-5f); 
 		color.a = clamp( max(0.0, color.a - _CurveParams.y), 0.0, _CurveParams.x) * sign(d - _CurveParams.w);
@@ -488,10 +488,10 @@
 		return color;
 	} 
 	
-	float4 fragCaptureCoc (v2f i) : COLOR 
+	float4 fragCaptureCoc (v2f i) : SV_Target 
 	{	
 		float4 color = float4(0,0,0,0); //tex2D (_MainTex, i.uv1.xy);
-		float d = UNITY_SAMPLE_DEPTH(tex2D(_CameraDepthTexture, i.uv1.xy));
+		float d = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv1.xy);
 		d = Linear01Depth (d);
 		color.a = _CurveParams.z * abs(d - _CurveParams.w) / (d + 1e-5f); 
 		color.a = clamp( max(0.0, color.a - _CurveParams.y), 0.0, _CurveParams.x);
@@ -499,17 +499,17 @@
 		return color;
 	} 
 
-	float4 AddFgCoc (v2f i) : COLOR 
+	float4 AddFgCoc (v2f i) : SV_Target 
 	{	
 		return tex2D (_MainTex, i.uv1.xy);
 	} 
 
-	float4 fragMergeCoc (v2f i) : COLOR 
+	float4 fragMergeCoc (v2f i) : SV_Target 
 	{	
 		float4 color = tex2D (_FgOverlap, i.uv1.xy); // this is the foreground overlap value
 		float fgCoc = color.a;
 
-		float d = UNITY_SAMPLE_DEPTH(tex2D(_CameraDepthTexture, i.uv1.xy));
+		float d = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv1.xy);
 		d = Linear01Depth (d);
 		color.a = _CurveParams.z * abs(d - _CurveParams.w) / (d + 1e-5f); 
 		color.a = clamp( max(0.0, color.a - _CurveParams.y), 0.0, _CurveParams.x);
@@ -517,7 +517,7 @@
 		return max(color.aaaa, float4(fgCoc,fgCoc,fgCoc,fgCoc));
 	} 
 
-	float4 fragCombineCocWithMaskBlur (v2f i) : COLOR 
+	float4 fragCombineCocWithMaskBlur (v2f i) : SV_Target 
 	{	
 		float bgAndFgCoc = tex2D (_MainTex, i.uv1.xy).a;
 		float fgOverlapCoc = tex2D (_FgOverlap, i.uv1.xy).a;
@@ -525,10 +525,10 @@
 		return (bgAndFgCoc < 0.01) * saturate(fgOverlapCoc-bgAndFgCoc);
 	} 
 	
-	float4 fragCaptureForegroundCoc (v2f i) : COLOR 
+	float4 fragCaptureForegroundCoc (v2f i) : SV_Target 
 	{	
 		float4 color = float4(0,0,0,0); //tex2D (_MainTex, i.uv1.xy);
-		float d = UNITY_SAMPLE_DEPTH(tex2D(_CameraDepthTexture, i.uv1.xy));
+		float d = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv1.xy);
 		d = Linear01Depth (d);
 		color.a = _CurveParams.z * (_CurveParams.w-d) / (d + 1e-5f);
 		color.a = clamp(max(0.0, color.a - _CurveParams.y), 0.0, _CurveParams.x);
@@ -536,10 +536,10 @@
 		return color;	
 	}	
 
-	float4 fragCaptureForegroundCocMask (v2f i) : COLOR 
+	float4 fragCaptureForegroundCocMask (v2f i) : SV_Target 
 	{	
 		float4 color = float4(0,0,0,0);
-		float d = UNITY_SAMPLE_DEPTH(tex2D(_CameraDepthTexture, i.uv1.xy));
+		float d = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv1.xy);
 		d = Linear01Depth (d);
 		color.a = _CurveParams.z * (_CurveParams.w-d) / (d + 1e-5f);
 		color.a = clamp(max(0.0, color.a - _CurveParams.y), 0.0, _CurveParams.x);
@@ -547,13 +547,13 @@
 		return color.a > 0;	
 	}	
 	
-	float4 fragBlendInHighRez (v2f i) : COLOR 
+	float4 fragBlendInHighRez (v2f i) : SV_Target 
 	{
 		float4 tapHighRez =  tex2D(_MainTex, i.uv.xy);
 		return float4(tapHighRez.rgb, 1.0-saturate(tapHighRez.a*5.0));
 	}
 	
-	float4 fragBlendInLowRezParts (v2f i) : COLOR 
+	float4 fragBlendInLowRezParts (v2f i) : SV_Target 
 	{
 		float4 from = tex2D(_MainTex, i.uv1.xy);
 		from.a = saturate(from.a * _Offsets.w) / (_CurveParams.x + 1e-5f);
@@ -562,13 +562,13 @@
 		return from;
 	}
 	
-	float4 fragUpsampleWithAlphaMask(v2f i) : COLOR 
+	float4 fragUpsampleWithAlphaMask(v2f i) : SV_Target 
 	{
 		float4 c = tex2D(_MainTex, i.uv1.xy);
 		return c;
 	}		
 	
-	float4 fragAlphaMask(v2f i) : COLOR 
+	float4 fragAlphaMask(v2f i) : SV_Target 
 	{
 		float4 c = tex2D(_MainTex, i.uv1.xy);
 		c.a = saturate(c.a*100.0);
@@ -585,16 +585,12 @@ Subshader
  Pass {
 	  ZTest Always Cull Off ZWrite Off
 	  ColorMask A
-	  Fog { Mode off }      
 
       CGPROGRAM
 
-      #pragma glsl
       #pragma target 3.0
-      #pragma fragmentoption ARB_precision_hint_fastest
       #pragma vertex vert
       #pragma fragment fragCaptureCoc
-      #pragma exclude_renderers d3d11_9x flash
       
       ENDCG
   	}
@@ -604,16 +600,12 @@ Subshader
  Pass 
  {
 	  ZTest Always Cull Off ZWrite Off
-	  Fog { Mode off }      
 
       CGPROGRAM
 
-      #pragma glsl
       #pragma target 3.0
-      #pragma fragmentoption ARB_precision_hint_fastest
       #pragma vertex vertBlurPlusMinus
       #pragma fragment fragGaussBlur
-      #pragma exclude_renderers d3d11_9x flash
 
       ENDCG
   	}
@@ -622,16 +614,12 @@ Subshader
 
  Pass {
 	  ZTest Always Cull Off ZWrite Off
-	  Fog { Mode off }      
 
       CGPROGRAM
 
-      #pragma glsl
       #pragma target 3.0
-      #pragma fragmentoption ARB_precision_hint_fastest
       #pragma vertex vertBlurPlusMinus
       #pragma fragment fragBlurForFgCoc
-      #pragma exclude_renderers d3d11_9x flash
 
       ENDCG
   	}
@@ -642,19 +630,15 @@ Subshader
  Pass 
  {
 	  ZTest Always Cull Off ZWrite Off
-	  Fog { Mode off }      
 	  ColorMask A
 	  BlendOp Max, Max
 	  Blend One One, One One
 
       CGPROGRAM
 
-      #pragma glsl
       #pragma target 3.0
-      #pragma fragmentoption ARB_precision_hint_fastest
       #pragma vertex vert
       #pragma fragment AddFgCoc
-      #pragma exclude_renderers d3d11_9x flash
 
       ENDCG
   	}  
@@ -665,17 +649,13 @@ Subshader
  Pass 
  {
 	  ZTest Always Cull Off ZWrite Off
-	  Fog { Mode off }      
 	  ColorMask A
 
       CGPROGRAM
 
-      #pragma glsl
       #pragma target 3.0
-      #pragma fragmentoption ARB_precision_hint_fastest
       #pragma vertex vert
       #pragma fragment fragCaptureForegroundCoc
-      #pragma exclude_renderers d3d11_9x flash
 
       ENDCG
   	} 
@@ -684,16 +664,12 @@ Subshader
  
  Pass {
 	  ZTest Always Cull Off ZWrite Off
-	  Fog { Mode off }      
 
       CGPROGRAM
 
-      #pragma glsl
       #pragma target 3.0
-      #pragma fragmentoption ARB_precision_hint_fastest
       #pragma vertex vert
       #pragma fragment fragBlurBox
-      #pragma exclude_renderers d3d11_9x flash
 
       ENDCG
   	} 
@@ -702,16 +678,12 @@ Subshader
  
  Pass { 
 	  ZTest Always Cull Off ZWrite Off
-	  Fog { Mode off }      
 
       CGPROGRAM
 
-      #pragma glsl
       #pragma target 3.0
-      #pragma fragmentoption ARB_precision_hint_fastest
       #pragma vertex vert
       #pragma fragment frag4TapBlurForLRSpawn
-      #pragma exclude_renderers d3d11_9x flash
 
       ENDCG
   	} 
@@ -722,16 +694,12 @@ Subshader
 	  ZTest Always Cull Off ZWrite Off
 	  ColorMask RGB
 	  Blend SrcAlpha OneMinusSrcAlpha
-  	  Fog { Mode off }      
 
       CGPROGRAM
 
-      #pragma glsl
       #pragma target 3.0
-      #pragma fragmentoption ARB_precision_hint_fastest
       #pragma vertex vert
       #pragma fragment fragBlendInHighRez
-      #pragma exclude_renderers d3d11_9x flash
 
       ENDCG
   	} 
@@ -742,16 +710,12 @@ Subshader
  {
 	  ZTest Always Cull Off ZWrite Off
 	  ColorMask A
-	  Fog { Mode off }       
 
       CGPROGRAM
 
-      #pragma glsl
       #pragma target 3.0
-      #pragma fragmentoption ARB_precision_hint_fastest
       #pragma vertex vert
       #pragma fragment fragCaptureForegroundCocMask
-      #pragma exclude_renderers d3d11_9x flash
 
       ENDCG
   	}   
@@ -761,16 +725,12 @@ Subshader
  
  Pass {
 	  ZTest Always Cull Off ZWrite Off
-	  Fog { Mode off }      
 
       CGPROGRAM
 
-      #pragma glsl
       #pragma target 3.0
-      #pragma fragmentoption ARB_precision_hint_fastest
       #pragma vertex vert
       #pragma fragment fragBlurUpsampleCheap
-      #pragma exclude_renderers d3d11_9x flash
 
       ENDCG
   	}   	 	 	  	 	 	  	
@@ -779,16 +739,12 @@ Subshader
  
  Pass {
 	  ZTest Always Cull Off ZWrite Off
-	  Fog { Mode off }      
 
       CGPROGRAM
 
-      #pragma glsl
       #pragma target 3.0
-      #pragma fragmentoption ARB_precision_hint_fastest
       #pragma vertex vert
       #pragma fragment fragCaptureColorAndSignedCoc
-      #pragma exclude_renderers d3d11_9x flash
 
       ENDCG
   	}   
@@ -797,16 +753,12 @@ Subshader
  
  Pass {
 	  ZTest Always Cull Off ZWrite Off
-	  Fog { Mode off }      
 
       CGPROGRAM
 
-      #pragma glsl
       #pragma target 3.0
-      #pragma fragmentoption ARB_precision_hint_fastest
       #pragma vertex vert
       #pragma fragment fragBlurInsaneMQ
-      #pragma exclude_renderers d3d11_9x flash
 
       ENDCG
   	} 
@@ -815,16 +767,12 @@ Subshader
  
  Pass {
 	  ZTest Always Cull Off ZWrite Off
-	  Fog { Mode off }      
 
       CGPROGRAM
 
-      #pragma glsl
       #pragma target 3.0
-      #pragma fragmentoption ARB_precision_hint_fastest
       #pragma vertex vert
       #pragma fragment fragBlurUpsampleCombineMQ
-      #pragma exclude_renderers d3d11_9x flash
 
       ENDCG
   	} 
@@ -832,18 +780,14 @@ Subshader
   	// pass 13
  Pass {
 	  ZTest Always Cull Off ZWrite Off
-	  Fog { Mode off }
 
 	  ColorMask A 
 
       CGPROGRAM
 
-      #pragma glsl
       #pragma target 3.0
-      #pragma fragmentoption ARB_precision_hint_fastest
       #pragma vertex vert
       #pragma fragment fragMergeCoc
-      #pragma exclude_renderers d3d11_9x flash
 
       ENDCG
   	}  
@@ -852,7 +796,6 @@ Subshader
  
  Pass {
 	  ZTest Always Cull Off ZWrite Off
-	  Fog { Mode off }    
 
 	  ColorMask A
 	  BlendOp Max, Max
@@ -860,12 +803,9 @@ Subshader
 
       CGPROGRAM
 
-      #pragma glsl
       #pragma target 3.0
-      #pragma fragmentoption ARB_precision_hint_fastest 
       #pragma vertex vert
       #pragma fragment fragCombineCocWithMaskBlur
-      #pragma exclude_renderers d3d11_9x flash
 
       ENDCG
   	} 
@@ -874,16 +814,12 @@ Subshader
  
  Pass {
 	  ZTest Always Cull Off ZWrite Off
-	  Fog { Mode off }      
 
       CGPROGRAM
 
-      #pragma glsl
       #pragma target 3.0
-      #pragma fragmentoption ARB_precision_hint_fastest
       #pragma vertex vert
       #pragma fragment fragBoxDownsample
-      #pragma exclude_renderers d3d11_9x flash
 
       ENDCG
   	}   
@@ -891,16 +827,12 @@ Subshader
  // pass 16
  Pass {
 	  ZTest Always Cull Off ZWrite Off
-	  Fog { Mode off }      
 
      	CGPROGRAM
 
-      	#pragma glsl
       	#pragma target 3.0
-      	#pragma fragmentoption ARB_precision_hint_fastest
       	#pragma vertex vert
 		#pragma fragment fragVisualize
-		#pragma exclude_renderers d3d11_9x flash
 
       	ENDCG
   	}	
@@ -909,16 +841,12 @@ Subshader
  
  Pass {
 	  ZTest Always Cull Off ZWrite Off
-	  Fog { Mode off }      
 
       CGPROGRAM
 
-      #pragma glsl
       #pragma target 3.0
-      #pragma fragmentoption ARB_precision_hint_fastest 
       #pragma vertex vert
       #pragma fragment fragBlurInsaneHQ
-      #pragma exclude_renderers d3d11_9x flash
 
       ENDCG
   	} 
@@ -927,16 +855,12 @@ Subshader
  
  Pass {
 	  ZTest Always Cull Off ZWrite Off
-	  Fog { Mode off }      
 
       CGPROGRAM
 
-      #pragma glsl
       #pragma target 3.0
-      #pragma fragmentoption ARB_precision_hint_fastest
       #pragma vertex vert
       #pragma fragment fragBlurUpsampleCombineHQ
-      #pragma exclude_renderers d3d11_9x flash
 
       ENDCG
   	}    	
@@ -945,16 +869,12 @@ Subshader
 
  Pass {
 	  ZTest Always Cull Off ZWrite Off
-	  Fog { Mode off }      
 
       CGPROGRAM
 
-      #pragma glsl	
       #pragma target 3.0
-      #pragma fragmentoption ARB_precision_hint_fastest
       #pragma vertex vertBlurPlusMinus
       #pragma fragment fragBlurAlphaWeighted
-      #pragma exclude_renderers d3d11_9x flash
 
       ENDCG
   	}    
@@ -963,16 +883,12 @@ Subshader
  
  Pass {
 	  ZTest Always Cull Off ZWrite Off
-	  Fog { Mode off }      
 
       CGPROGRAM
 
-      #pragma glsl
       #pragma target 3.0
-      #pragma fragmentoption ARB_precision_hint_fastest
       #pragma vertex vert
       #pragma fragment fragAlphaMask
-      #pragma exclude_renderers d3d11_9x flash
 
       ENDCG
   	}
@@ -981,19 +897,15 @@ Subshader
  
  Pass {
 	  ZTest Always Cull Off ZWrite Off
-	  Fog { Mode off }  
 
 	  BlendOp Add, Add
 	  Blend DstAlpha OneMinusDstAlpha, Zero One
 
       CGPROGRAM
 
-      #pragma glsl
       #pragma target 3.0
-      #pragma fragmentoption ARB_precision_hint_fastest
       #pragma vertex vertFlip
       #pragma fragment fragBlurBox
-      #pragma exclude_renderers d3d11_9x flash
 
       ENDCG
   	}	
@@ -1002,7 +914,6 @@ Subshader
  
  Pass {
 	  ZTest Always Cull Off ZWrite Off
-	  Fog { Mode off }  
 
 	  // destination alpha needs to stay intact as we have layed alpha before
 	  BlendOp Add, Add
@@ -1010,12 +921,9 @@ Subshader
 
       CGPROGRAM
       
-      #pragma glsl
       #pragma target 3.0
-      #pragma fragmentoption ARB_precision_hint_fastest
       #pragma vertex vert
       #pragma fragment fragUpsampleWithAlphaMask
-      #pragma exclude_renderers d3d11_9x flash
 
       ENDCG
   	} 	
