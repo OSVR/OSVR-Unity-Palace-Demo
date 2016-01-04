@@ -103,6 +103,7 @@ namespace OSVR
                     eye.EyeIndex = eyeIndex; //set the eye's index
                     eyeGameObject.transform.parent = DisplayController.transform; //child of DisplayController
                     eyeGameObject.transform.localPosition = Vector3.zero;
+                    eyeGameObject.transform.rotation = this.transform.rotation;
                     _eyes[eyeIndex] = eye;
                     uint eyeSurfaceCount = DisplayController.DisplayConfig.GetNumSurfacesForViewerEye(ViewerIndex, (byte)eyeIndex);
                     eye.CreateSurfaces(eyeSurfaceCount);
@@ -144,10 +145,8 @@ namespace OSVR
                 {                   
                     //update the eye pose
                     VREye eye = Eyes[eyeIndex];
-                    //get eye pose from DisplayConfig
-                    //@todo fix bug with poses coming from RenderManager
-                    eye.UpdateEyePose(_displayController.DisplayConfig.GetViewerEyePose(ViewerIndex, (byte)eyeIndex));
-                    /*if (DisplayController.UseRenderManager)
+
+                    if (DisplayController.UseRenderManager)
                     { 
                         //get eye pose from RenderManager                     
                         eye.UpdateEyePose(DisplayController.RenderManager.GetRenderManagerEyePose((byte)eyeIndex));
@@ -156,7 +155,7 @@ namespace OSVR
                     {
                         //get eye pose from DisplayConfig
                         eye.UpdateEyePose(_displayController.DisplayConfig.GetViewerEyePose(ViewerIndex, (byte)eyeIndex));
-                    }*/
+                    }
                         
 
                     // update the eye's surfaces, includes call to Render
@@ -177,20 +176,8 @@ namespace OSVR
             // OnPreRender is not called because we disable the camera here.
             void OnPreCull()
             {
-                
-                if(!DisplayController.CheckDisplayStartup())
-                {
-                    //leave this preview camera enabled if there is no display config
-                    _camera.enabled = true;
-                }
-                else
-                {
-                    // To save Render time, disable this camera here and re-enable after the frame
-                    // OR, in DirectMode, leave it on for "mirror" mode, although this is an expensive operation
-                    // The long-term solution is to provide a DirectMode preview window in RenderManager
-                    //@todo enable directmode preview in RenderManager
-                    _camera.enabled = DisplayController.UseRenderManager && DisplayController.showDirectModePreview;
-                }
+                //leave the preview camera enabled if there is no display config
+                _camera.enabled = !DisplayController.CheckDisplayStartup();
 
                 DoRendering();
 
@@ -228,23 +215,28 @@ namespace OSVR
             IEnumerator EndOfFrame()
             {
                 while (true)
-                {
-                    //if we disabled the dummy camera, enable it here
-                    if (_disabledCamera)
-                    {
-                        Camera.enabled = true;
-                        _disabledCamera = false;
-                    }
+                {                  
                     yield return new WaitForEndOfFrame();
                     if (DisplayController.UseRenderManager && DisplayController.CheckDisplayStartup())
                     {
                         // Issue a RenderEvent, which copies Unity RenderTextures to RenderManager buffers
 #if UNITY_5_2 || UNITY_5_3
-                        GL.IssuePluginEvent(DisplayController.RenderManager.GetRenderEventFunction(), OsvrRenderManager.RENDER_EVENT);
+                        GL.Clear(false, true, Camera.backgroundColor);
+                        GL.IssuePluginEvent(DisplayController.RenderManager.GetRenderEventFunction(), OsvrRenderManager.RENDER_EVENT); 
+                        if(DisplayController.showDirectModePreview)
+                        {
+                            Camera.Render();
+                        }                      
 #else
                         Debug.LogError("GL.IssuePluginEvent failed. This version of Unity cannot support RenderManager.");
                         DisplayController.UseRenderManager = false;
 #endif
+                    }
+                    //if we disabled the dummy camera, enable it here
+                    if (_disabledCamera)
+                    {
+                        Camera.enabled = true;
+                        _disabledCamera = false;
                     }
 
                 }

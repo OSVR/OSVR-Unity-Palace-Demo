@@ -5,14 +5,13 @@ Properties {
 	_SSAO ("", 2D) = "" {}
 }
 Subshader {
-	ZTest Always Cull Off ZWrite Off Fog { Mode Off }
+	ZTest Always Cull Off ZWrite Off
 
 CGINCLUDE
 // Common code used by several SSAO passes below
 #include "UnityCG.cginc"
-#pragma exclude_renderers gles
 struct v2f_ao {
-	float4 pos : POSITION;
+	float4 pos : SV_POSITION;
 	float2 uv : TEXCOORD0;
 	float2 uvr : TEXCOORD1;
 };
@@ -33,19 +32,24 @@ sampler2D _CameraDepthNormalsTexture;
 sampler2D _RandomTexture;
 float4 _Params; // x=radius, y=minz, z=attenuation power, w=SSAO power
 
-#ifdef UNITY_COMPILER_HLSL
+// HLSL and GLSL do not support arbitrarily sized arrays as function parameters (eg. float bla[]), whereas Cg does.
+#if !defined(UNITY_COMPILER_CG)
 
 #	define INPUT_SAMPLE_COUNT 8
 #	include "frag_ao.cginc"
+#	undef INPUT_SAMPLE_COUNT
 
 #	define INPUT_SAMPLE_COUNT 14
 #	include "frag_ao.cginc"
+#	undef INPUT_SAMPLE_COUNT
 
 #	define INPUT_SAMPLE_COUNT 26
 #	include "frag_ao.cginc"
+#	undef INPUT_SAMPLE_COUNT
 
 #	define INPUT_SAMPLE_COUNT 34
 #	include "frag_ao.cginc"
+#	undef INPUT_SAMPLE_COUNT
 
 #else
 #	define INPUT_SAMPLE_COUNT
@@ -61,10 +65,9 @@ CGPROGRAM
 #pragma vertex vert_ao
 #pragma fragment frag
 #pragma target 3.0
-#pragma fragmentoption ARB_precision_hint_fastest
 
 
-half4 frag (v2f_ao i) : COLOR
+half4 frag (v2f_ao i) : SV_Target
 {
 	#define SAMPLE_COUNT 8
 	const float3 RAND_SAMPLES[SAMPLE_COUNT] = {
@@ -90,10 +93,9 @@ CGPROGRAM
 #pragma vertex vert_ao
 #pragma fragment frag
 #pragma target 3.0
-#pragma fragmentoption ARB_precision_hint_fastest
 
 
-half4 frag (v2f_ao i) : COLOR
+half4 frag (v2f_ao i) : SV_Target
 {
 	#define SAMPLE_COUNT 14
 	const float3 RAND_SAMPLES[SAMPLE_COUNT] = {
@@ -125,10 +127,9 @@ CGPROGRAM
 #pragma vertex vert_ao
 #pragma fragment frag
 #pragma target 3.0
-#pragma fragmentoption ARB_precision_hint_fastest
 
 
-half4 frag (v2f_ao i) : COLOR
+half4 frag (v2f_ao i) : SV_Target
 {
 	#define SAMPLE_COUNT 26
 	const float3 RAND_SAMPLES[SAMPLE_COUNT] = {
@@ -171,11 +172,10 @@ CGPROGRAM
 #pragma vertex vert
 #pragma fragment frag
 #pragma target 3.0
-#pragma fragmentoption ARB_precision_hint_fastest
 #include "UnityCG.cginc"
 
 struct v2f {
-	float4 pos : POSITION;
+	float4 pos : SV_POSITION;
 	float2 uv : TEXCOORD0;
 };
 
@@ -206,7 +206,7 @@ inline half CheckSame (half4 n, half4 nn)
 }
 
 
-half4 frag( v2f i ) : COLOR
+half4 frag( v2f i ) : SV_Target
 {
 	#define NUM_BLUR_SAMPLES 4
 	
@@ -243,11 +243,10 @@ ENDCG
 CGPROGRAM
 #pragma vertex vert
 #pragma fragment frag
-#pragma fragmentoption ARB_precision_hint_fastest
 #include "UnityCG.cginc"
 
 struct v2f {
-	float4 pos : POSITION;
+	float4 pos : SV_POSITION;
 	float2 uv[2] : TEXCOORD0;
 };
 
@@ -263,7 +262,7 @@ v2f vert (appdata_img v)
 sampler2D _MainTex;
 sampler2D _SSAO;
 
-half4 frag( v2f i ) : COLOR
+half4 frag( v2f i ) : SV_Target
 {
 	half4 c = tex2D (_MainTex, i.uv[0]);
 	half ao = tex2D (_SSAO, i.uv[1]).r;

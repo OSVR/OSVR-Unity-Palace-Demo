@@ -38,15 +38,11 @@ Shader "Hidden/FXAA III (Console)" {
 	SubShader {
 		Pass {
 			ZTest Always Cull Off ZWrite Off
-			Fog { Mode off }
 		
 		CGPROGRAM
 		#pragma vertex vert
 		#pragma fragment frag
-		#pragma glsl
-		#pragma fragmentoption ARB_precision_hint_fastest
 		#pragma target 3.0
-		#pragma exclude_renderers d3d11_9x
 		
 		#include "UnityCG.cginc"
 
@@ -80,7 +76,11 @@ Shader "Hidden/FXAA III (Console)" {
 			float4 rcpSize;
 			rcpSize.xy = -_MainTex_TexelSize.xy * 0.5f;
 			rcpSize.zw = _MainTex_TexelSize.xy * 0.5f;			
-			
+#if defined (SHADER_API_PSP2)
+			//cg compiler linker bug workaround
+			float almostzero = v.texcoord.x*0.000001f;
+			rcpSize.x += almostzero;
+#endif
 			o.interpolatorA = extents;
 			o.interpolatorB = rcpSize;
 			o.interpolatorC = rcpSize;
@@ -158,7 +158,7 @@ Shader "Hidden/FXAA III (Console)" {
 				return rgbyB;
 		}
 
-		half4 frag (v2f i) : COLOR
+		half4 frag (v2f i) : SV_Target
 		{
 			half3 color = FxaaPixelShader(i.uv, i.interpolatorA, i.interpolatorB, i.interpolatorC);
 			return half4(color, 1.0);

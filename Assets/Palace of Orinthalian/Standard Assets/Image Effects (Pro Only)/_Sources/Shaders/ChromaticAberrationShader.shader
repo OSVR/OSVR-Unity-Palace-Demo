@@ -8,7 +8,7 @@ Shader "Hidden/ChromaticAberration" {
 	#include "UnityCG.cginc"
 	
 	struct v2f {
-		float4 pos : POSITION;
+		float4 pos : SV_POSITION;
 		float2 uv : TEXCOORD0;
 	};
 	
@@ -18,6 +18,7 @@ Shader "Hidden/ChromaticAberration" {
 	half _ChromaticAberration;
 	half _AxialAberration;
 	half _Luminance;
+	half2 _BlurDistance;
 		
 	v2f vert( appdata_img v ) 
 	{
@@ -28,7 +29,7 @@ Shader "Hidden/ChromaticAberration" {
 		return o;
 	} 
 	
-	half4 fragDs(v2f i) : COLOR 
+	half4 fragDs(v2f i) : SV_Target 
 	{
 		half4 c = tex2D (_MainTex, i.uv.xy + _MainTex_TexelSize.xy * 0.5);
 		c += tex2D (_MainTex, i.uv.xy - _MainTex_TexelSize.xy * 0.5);
@@ -37,7 +38,7 @@ Shader "Hidden/ChromaticAberration" {
 		return c/4.0;
 	}
 
-	half4 frag(v2f i) : COLOR 
+	half4 frag(v2f i) : SV_Target 
 	{
 		half2 coords = i.uv;
 		half2 uv = i.uv;
@@ -72,18 +73,18 @@ Shader "Hidden/ChromaticAberration" {
 		half2(-0.32194,-0.932615),
 	};
 
-	half4 fragComplex(v2f i) : COLOR 
+	half4 fragComplex(v2f i) : SV_Target 
 	{
 		half2 coords = i.uv;
 		half2 uv = i.uv;
 		
 		// corner heuristic
-		coords = (coords - 0.5) * 2.0;		
+		coords = (coords - 0.5h) * 2.0h;		
 		half coordDot = dot (coords,coords);
 
 		half4 color = tex2D (_MainTex, uv);
 		half tangentialStrength = _ChromaticAberration * coordDot * coordDot;
-		half maxOfs = clamp(max(_AxialAberration, tangentialStrength), -2.5h, 2.5h);
+		half maxOfs = clamp(max(_AxialAberration, tangentialStrength), _BlurDistance.x, _BlurDistance.y);
 
 		// we need a blurred sample tap for advanced aberration
 
@@ -91,7 +92,7 @@ Shader "Hidden/ChromaticAberration" {
 		// and if you do have a proper HDR setup, lerping .rb might yield better results than .g
 		// (see below)
 
-		half4 blurredTap = color * 0.2h;
+		half4 blurredTap = color * 0.1h;
 		for(int l=0; l < SmallDiscKernelSamples; l++)
 		{
 			half2 sampleUV = uv + SmallDiscKernel[l].xy * _MainTex_TexelSize.xy * maxOfs;
@@ -103,12 +104,13 @@ Shader "Hidden/ChromaticAberration" {
 		// debug:
 		//return blurredTap;
 
-		half isEdge = saturate(_Luminance * abs(Luminance(blurredTap.rgb)-Luminance(color.rgb)));
+		half lumDiff = Luminance(abs(blurredTap.rgb-color.rgb));
+		half isEdge = saturate(_Luminance * lumDiff);
 		
 		// debug #2:
 		//return isEdge;
 
-		color.g = lerp(color.g, blurredTap.g, saturate(isEdge));
+		color.rb = lerp(color.rb, blurredTap.rb, isEdge);
 		
 		return color;
 	}
@@ -120,7 +122,6 @@ Subshader {
  // 0: box downsample
  Pass {
 	  ZTest Always Cull Off ZWrite Off
-	  Fog { Mode off }      
 
       CGPROGRAM
       
@@ -132,7 +133,6 @@ Subshader {
 // 1: simple chrom aberration
 Pass {
 	  ZTest Always Cull Off ZWrite Off
-	  Fog { Mode off }      
 
       CGPROGRAM
       
@@ -144,11 +144,9 @@ Pass {
 // 2: simulates more chromatic aberration effects
 Pass {
 	  ZTest Always Cull Off ZWrite Off
-	  Fog { Mode off }
 
       CGPROGRAM
       
-      #pragma exclude_renderers flash
       #pragma vertex vert
       #pragma fragment fragComplex
       
