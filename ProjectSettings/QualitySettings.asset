@@ -241,7 +241,7 @@ QualitySettings:
     asyncUploadBufferSize: 4
     excludedTargetPlatforms: []
   m_PerPlatformDefaultQuality:
-    Android: 6
+    Android: 0
     BlackBerry: 1
     FlashPlayer: 2
     GLES Emulation: 2
