@@ -1,9 +1,9 @@
+using System;
 using UnityEngine;
 
-[ExecuteInEditMode]
-[RequireComponent(typeof(WaterBase))]
-
-public class GerstnerDisplace : Displace 
-{		
-		
+namespace UnityStandardAssets.Water
+{
+    [ExecuteInEditMode]
+    [RequireComponent(typeof(WaterBase))]
+    public class GerstnerDisplace : Displace { }
 }

@@ -10,7 +10,7 @@ Shader "Hidden/RadialBlur"
 	#include "UnityCG.cginc"
 	
 	struct v2f {
-		float4 pos : POSITION;
+		float4 pos : SV_POSITION;
 		float2 uv : TEXCOORD0;
 		float2 blurVector : TEXCOORD1;
 	};
@@ -35,7 +35,7 @@ Shader "Hidden/RadialBlur"
 	#define SAMPLES_FLOAT 6.0f
 	#define SAMPLES_INT 6
 	
-	half4 frag(v2f i) : COLOR 
+	half4 frag(v2f i) : SV_Target 
 	{
 		half4 color = half4(0,0,0,0);
 				
@@ -57,10 +57,8 @@ Subshader
  Blend One Zero
  Pass {
 	  ZTest Always Cull Off ZWrite Off
-	  Fog { Mode off }      
 
       CGPROGRAM
-      #pragma fragmentoption ARB_precision_hint_fastest
       #pragma vertex vert
       #pragma fragment frag
       

@@ -9,6 +9,4 @@ EditorBuildSettings:
     path: Assets/Palace of Orinthalian/[Scenes]/Palace of Orinthalian/The Palace of
       Orinthalian.unity
   - enabled: 0
-    path: Assets/OSVRUnity/Sample/Demo/Scenes/OSVRDemo2.unity
-  - enabled: 0
-    path: Assets/testscene.unity
+    path: Assets/OSVRUnity/Sample/VRFirstPerson.unity

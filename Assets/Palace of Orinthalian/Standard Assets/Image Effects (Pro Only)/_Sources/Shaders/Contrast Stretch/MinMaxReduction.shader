@@ -10,16 +10,14 @@ Category {
 	SubShader {
 		Pass {
 			ZTest Always Cull Off ZWrite Off
-			Fog { Mode off }
 				
 CGPROGRAM
 #pragma vertex vert
 #pragma fragment frag
-#pragma fragmentoption ARB_precision_hint_fastest 
 #include "UnityCG.cginc"
 
 struct v2f { 
-	float4 position : POSITION;  
+	float4 position : SV_POSITION;  
 	float2 uv[4]    : TEXCOORD0;
 }; 
 
@@ -38,7 +36,7 @@ v2f vert (appdata_img v) {
 	return o;
 }
 
-float4 frag (v2f i) : COLOR
+float4 frag (v2f i) : SV_Target
 {
 	// Sample pixel block
 	float4 v00 = tex2D(_MainTex, i.uv[0]);

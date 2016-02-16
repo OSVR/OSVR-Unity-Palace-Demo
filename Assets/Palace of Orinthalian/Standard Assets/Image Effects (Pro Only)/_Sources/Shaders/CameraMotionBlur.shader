@@ -1,14 +1,19 @@
  /*
- 	motion blur image effect
+ 	CAMERA MOTION BLUR IMAGE EFFECTS
 
-	variation of simon green's implementation of "plausible motion blur"
+ 	Reconstruction Filter:
+	Based on "Plausible Motion Blur"
 	http://graphics.cs.williams.edu/papers/MotionBlurI3D12/
 
-	and alex vlacho´s motion blur in
+	CameraMotion:
+	Based on Alex Vlacho's technique in
 	http://www.valvesoftware.com/publications/2008/GDC2008_PostProcessingInTheOrangeBox.pdf
 
-	TODO: add vignetting mask to hide blurring center objects in camera mode
-	TODO: add support for dynamic and skinned objects
+	SimpleBlur:
+	Straightforward sampling along velocities
+
+	ScatterFromGather:
+	Combines Reconstruction with depth of field type defocus
  */
  
  Shader "Hidden/CameraMotionBlur" {
@@ -23,24 +28,38 @@
 	
 	#include "UnityCG.cginc"
 	
-	// noisiness
-	#define JITTER_SCALE (0.125f)
 	// 's' in paper (# of samples for reconstruction)
-	#define NUM_SAMPLES (13)
+	#define NUM_SAMPLES (11)
 	// # samples for valve style blur
 	#define MOTION_SAMPLES (16)
 	// 'k' in paper
-	// (mclamped to MAX_RADIUS)	
 	float _MaxRadiusOrKInPaper;
+
+	static const int SmallDiscKernelSamples = 12;		
+	static const float2 SmallDiscKernel[SmallDiscKernelSamples] =
+	{
+		float2(-0.326212,-0.40581),
+		float2(-0.840144,-0.07358),
+		float2(-0.695914,0.457137),
+		float2(-0.203345,0.620716),
+		float2(0.96234,-0.194983),
+		float2(0.473434,-0.480026),
+		float2(0.519456,0.767022),
+		float2(0.185461,-0.893124),
+		float2(0.507431,0.064425),
+		float2(0.89642,0.412458),
+		float2(-0.32194,-0.932615),
+		float2(-0.791559,-0.59771)
+	};
 
 	struct v2f 
 	{
-		float4 pos : POSITION;
+		float4 pos : SV_POSITION;
 		float2 uv  : TEXCOORD0;
 	};
 				
 	sampler2D _MainTex;
-	sampler2D _CameraDepthTexture;
+	sampler2D_float _CameraDepthTexture;
 	sampler2D _VelTex;
 	sampler2D _NeighbourMaxTex;
 	sampler2D _NoiseTex;
@@ -53,6 +72,8 @@
 	float4x4 _InvViewProj;	// inverse view-projection matrix
 	float4x4 _PrevViewProj;	// previous view-projection matrix
 	float4x4 _ToPrevViewProjCombined; // combined
+
+	float _Jitter;
 	
 	float _VelocityScale;
 	float _DisplayVelocityScale;
@@ -72,8 +93,7 @@
 		return o;
 	}
 	
-	// calculate velocity for static scene from depth buffer			
-	float4 CameraVelocity(v2f i) : COLOR
+	float4 CameraVelocity(v2f i) : SV_Target
 	{
 		float2 depth_uv = i.uv;
 
@@ -83,7 +103,7 @@
 		#endif
 
 		// read depth
-		float d = UNITY_SAMPLE_DEPTH(tex2D(_CameraDepthTexture, depth_uv));
+		float d = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, depth_uv);
 		
 		// calculate position from pixel from depth
 		float3 clipPos = float3(i.uv.x*2.0-1.0, (i.uv.y)*2.0-1.0, d);
@@ -99,17 +119,26 @@
 		prevClipPos.xyz /= prevClipPos.w;
 		*/
 
-		float2 vel = _VelocityScale * /* exposure * framerate * */ (clipPos.xy - prevClipPos.xy) / 2.f;
-
+		/*
+		float2 vel = _VelocityScale *(clipPos.xy - prevClipPos.xy) / 2.f;
 		// clamp to maximum velocity (in pixels)
 		float maxVel = length(_MainTex_TexelSize.xy*_MaxVelocity);
 		if (length(vel) > maxVel) {
 			vel = normalize(vel) * maxVel;
 		}
 		return float4(vel, 0.0, 0.0);
+		*/
+
+		float2 vel = _MainTex_TexelSize.zw * _VelocityScale * (clipPos.xy - prevClipPos.xy) / 2.f;
+		float vellen = length(vel);
+		float maxVel = _MaxVelocity;
+		float2 velOut = vel * max(0.5, min(vellen, maxVel)) / (vellen + 1e-2f);
+		velOut *= _MainTex_TexelSize.xy;
+		return float4(velOut, 0.0, 0.0);
+		
 	}
 
-	// returns vector with largest magnitude
+	// vector with largest magnitude
 	float2 vmax(float2 a, float2 b)
 	{
 		float ma = dot(a, a);
@@ -118,65 +147,51 @@
 	}
 
 	// find dominant velocity for each tile
-	float4 TileMax(v2f i) : COLOR
+	float4 TileMax(v2f i) : SV_Target
 	{
-		// NOTE: weird loop & uv addressing due to circumventing HLSL2GLSL compiler bug
+		float2 uvCorner = i.uv - _MainTex_TexelSize.xy * (_MaxRadiusOrKInPaper * 0.5);
+  	  	float2 maxvel = float2(0,0);
+  	  	float4 baseUv = float4(uvCorner,0,0);
+  	  	float4 uvScale = float4(_MainTex_TexelSize.xy, 0, 0);
 
-		float halfk = _MaxRadiusOrKInPaper * 0.5;
-
-		float2 uvCorner = i.uv - _MainTex_TexelSize.xy * (float2(halfk,halfk)-float2(.5,.5));
-		float2 mx = tex2D(_MainTex, uvCorner);
-
-		// debug:
-		//return tex2D(_MainTex, i.uv);
-
-		for(int j=0; j<=(int)(_MaxRadiusOrKInPaper-1)*(_MaxRadiusOrKInPaper-1); j++) 
-		{
-			float t = ((float)j)/((float)_MaxRadiusOrKInPaper);
-			float2 uv = float2(frac(t)*(_MaxRadiusOrKInPaper), (j/(int)_MaxRadiusOrKInPaper)) * _MainTex_TexelSize.xy;
-			mx = vmax(mx, tex2Dlod(_MainTex, float4(uvCorner + uv,0,0)).xy);
+  	  	for(int l=0; l<(int)_MaxRadiusOrKInPaper; l++)
+  	  	{
+  	  		for(int k=0; k<(int)_MaxRadiusOrKInPaper; k++)
+  	  		{
+				maxvel = vmax(maxvel, tex2Dlod(_MainTex, baseUv + float4(l,k,0,0) * uvScale).xy);  	  		
+  	  		}
   	  	}
-
-  	  	return float4(mx, 0, 0);
+  	  	return float4(maxvel, 0, 1);
 	}
 
 	// find maximum velocity in any adjacent tile
-	float4 NeighbourMax(v2f i) : COLOR
+	float4 NeighbourMax(v2f i) : SV_Target
 	{
-		// NOTE: weird loop & uv addressing due to circumventing HLSL2GLSL compiler bug
-
-		// debug:
-		//return tex2D(_MainTex, i.uv);
-
 		float2 x_ = i.uv;
 
-		// to fetch all neighbours, we need 3x3 samples
+		// to fetch all neighbours, we need 3x3 point filtered samples
 
-		float2 mx = tex2D(_MainTex, x_+float2(.9,.9)*_MainTex_TexelSize.xy).xy;
-		mx = vmax(mx, tex2D(_MainTex, x_+float2(.9,0)*_MainTex_TexelSize.xy).xy);
-		mx = vmax(mx, tex2D(_MainTex, x_+float2(.9,-.9)*_MainTex_TexelSize.xy).xy);
+		float2 nx =   tex2D(_MainTex, x_+float2(1.0, 1.0)*_MainTex_TexelSize.xy).xy;
+		nx = vmax(nx, tex2D(_MainTex, x_+float2(1.0, 0.0)*_MainTex_TexelSize.xy).xy);
+		nx = vmax(nx, tex2D(_MainTex, x_+float2(1.0,-1.0)*_MainTex_TexelSize.xy).xy);
+		nx = vmax(nx, tex2D(_MainTex, x_+float2(0.0, 1.0)*_MainTex_TexelSize.xy).xy);
+		nx = vmax(nx, tex2D(_MainTex, x_+float2(0.0, 0.0)*_MainTex_TexelSize.xy).xy);
+		nx = vmax(nx, tex2D(_MainTex, x_+float2(0.0,-1.0)*_MainTex_TexelSize.xy).xy);
+		nx = vmax(nx, tex2D(_MainTex, x_+float2(-1.0, 1.0)*_MainTex_TexelSize.xy).xy);
+		nx = vmax(nx, tex2D(_MainTex, x_+float2(-1.0, 0.0)*_MainTex_TexelSize.xy).xy);
+		nx = vmax(nx, tex2D(_MainTex, x_+float2(-1.0,-1.0)*_MainTex_TexelSize.xy).xy);
 
-		mx = vmax(mx, tex2D(_MainTex, x_+float2(.0,.9)*_MainTex_TexelSize.xy).xy);
-		mx = vmax(mx, tex2D(_MainTex, x_+float2(.0,.0)*_MainTex_TexelSize.xy).xy);
-		mx = vmax(mx, tex2D(_MainTex, x_+float2(.0,-.9)*_MainTex_TexelSize.xy).xy);		
-		
-		mx = vmax(mx, tex2D(_MainTex, x_+float2(-.9,.9)*_MainTex_TexelSize.xy).xy);
-		mx = vmax(mx, tex2D(_MainTex, x_+float2(-.9,.0)*_MainTex_TexelSize.xy).xy);
-		mx = vmax(mx, tex2D(_MainTex, x_+float2(-.9,-.9)*_MainTex_TexelSize.xy).xy);
-
-  	  	return float4(mx, 0, 0);		
+  	  	return float4(nx, 0, 0);		
 	}
 	 	 	
-	float4 Debug(v2f i) : COLOR
+	float4 Debug(v2f i) : SV_Target
 	{
-		//return saturate(tex2D(_NeighbourMaxTex, i.uv).xxxx * _DisplayVelocityScale);
 		return saturate( float4(tex2D(_MainTex, i.uv).x,abs(tex2D(_MainTex, i.uv).y),-tex2D(_MainTex, i.uv).xy) * _DisplayVelocityScale);
 	}
 
 	// classification filters
 	float cone(float2 px, float2 py, float2 v)
 	{
-		// ole: i like the more "cony" result better ... TODO: maybe change cone to clamp(1.0 - (0.75*length(px - py) / length(v)), 0.0, 1.0);
 		return clamp(1.0 - (length(px - py) / length(v)), 0.0, 1.0);
 	}
 
@@ -192,7 +207,7 @@
 		return clamp(1.0 - (za - zb) / _SoftZDistance, 0.0, 1.0);
 	}
 
-	float4 SimpleBlur (v2f i) : COLOR
+	float4 SimpleBlur (v2f i) : SV_Target
 	{
 		float2 x = i.uv;
 		float2 xf = x;
@@ -215,9 +230,8 @@
 		sum /= NUM_SAMPLES;		
 		return sum;
 	}
-		
-	// reconstruction based blur
-	float4 ReconstructFilterBlur(v2f i) : COLOR
+
+	float4 ReconstructFilterBlur(v2f i) : SV_Target
 	{	
 		// uv's
 
@@ -231,21 +245,18 @@
 
 		float2 x2 = xf;
 		
-		float2 vn = tex2D(_NeighbourMaxTex, x2).xy;	// largest velocity in neighbourhood
-		float4 cx = tex2D(_MainTex, x);				// color at x
-		float2 vx = tex2D(_VelTex, xf).xy;			// vel at x 
+		float2 vn = tex2Dlod(_NeighbourMaxTex, float4(x2,0,0)).xy;	// largest velocity in neighbourhood
+		float4 cx = tex2Dlod(_MainTex, float4(x,0,0));				// color at x
+		float2 vx = tex2Dlod(_VelTex, float4(xf,0,0)).xy;			// vel at x 
 
-		// debug:
-		//return float4(length(vn)-length(vx),0,0,0)*20;
-
-		float zx = UNITY_SAMPLE_DEPTH(tex2D(_CameraDepthTexture, x));
-		zx = -Linear01Depth(zx);					// depth at x
+		float zx = SAMPLE_DEPTH_TEXTURE_LOD(_CameraDepthTexture, float4(x,0,0));
+		zx = -Linear01Depth(zx);
 
 		// random offset [-0.5, 0.5]
-		float j = (tex2D(_NoiseTex, i.uv * 11.0f).r*2-1) * JITTER_SCALE;
+		float j = (tex2Dlod(_NoiseTex, float4(i.uv,0,0) * 11.0f).r*2-1) * _Jitter;
 
 		// sample current pixel
-		float weight = 1.0/(1.0+length(vx*_MainTex_TexelSize.zw));
+		float weight = 0.75; // <= good start weight choice??
 		float4 sum = cx * weight;
  
 		int centerSample = (int)(NUM_SAMPLES-1)/2;
@@ -259,8 +270,8 @@
 			if (l==centerSample) contrib = 0.0f;	// skip center sample
 		#endif
 
-			float t = lerp(-1.0, 1.0, (l + j + 1.0) / ((float)NUM_SAMPLES + 1.0));	// paper
-			//float t = lerp(-1.0, 1.0, l / (float)(NUM_SAMPLES - 1)); // simon
+			float t = lerp(-1.0, 1.0, (l + j) / (-1 + _Jitter + (float)NUM_SAMPLES));
+			//float t = lerp(-1.0, 1.0, l / (float)(NUM_SAMPLES - 1)); 
 
 			float2 y = x + vn * t;
 
@@ -271,31 +282,103 @@
 			#endif
 
 			// velocity at y 
-			float2 vy = tex2D(_VelTex, yf).xy;
+			float2 vy = tex2Dlod(_VelTex, float4(yf,0,0)).xy;
 
-			float zy = UNITY_SAMPLE_DEPTH(tex2D(_CameraDepthTexture, y)); 
-			zy = -Linear01Depth(zy);						
-			
+			float zy = SAMPLE_DEPTH_TEXTURE_LOD(_CameraDepthTexture, float4(y,0,0)); 
+			zy = -Linear01Depth(zy);
 			float f = softDepthCompare(zx, zy);
 			float b = softDepthCompare(zy, zx);
-			float alphay = f * cone(y, x, vy) +	// blurry y in front of any x
-			               b * cone(x, y, vx) +	// any y behing blurry x; estimate background
-			               cylinder(y, x, vy) * cylinder(x, y, vx) * 2.0;	// simultaneous blurry x and y
-			// debug:
-			//float alphay = 1;
+			float alphay = b * cone(x, y, vx) + f * cone(y, x, vy) +  cylinder(y, x, vy) * cylinder(x, y, vx) * 2.0;
 
-			// accumulate sample 
-			float4 cy = tex2D(_MainTex, y);
+			float4 cy = tex2Dlod(_MainTex, float4(y,0,0));
 			sum += cy * alphay * contrib;
 			weight += alphay * contrib;
 		}
 		sum /= weight;
-
 		return sum;
 	}
 
+	float4 ReconstructionDiscBlur (v2f i) : SV_Target
+	{
+		float2 xf = i.uv;
+		float2 x = i.uv;
 
-	float4 MotionVectorBlur (v2f i) : COLOR
+		#if UNITY_UV_STARTS_AT_TOP
+		if (_MainTex_TexelSize.y < 0)
+    		xf.y = 1 - xf.y;
+		#endif
+
+		float2 x2 = xf;
+
+		float2 vn 			= tex2Dlod(_NeighbourMaxTex, float4(x2,0,0)).xy;	// largest velocity in neighbourhood
+		float4 cx 			= tex2Dlod(_MainTex, float4(x,0,0));				// color at x
+		float2 vx 			= tex2Dlod(_VelTex, float4(xf,0,0)).xy;			// vel at x 
+
+		float4 noise 		= tex2Dlod(_NoiseTex, float4(i.uv,0,0)*11.0f)*2-1;
+		float zx 			= SAMPLE_DEPTH_TEXTURE_LOD(_CameraDepthTexture, float4(x,0,0));
+
+		zx = -Linear01Depth(zx);
+
+		noise *= _MainTex_TexelSize.xyxy * _Jitter;
+
+		//return abs(blurDir.xyxy)*10 + centerTap;
+
+		float weight = 1.0; // <- maybe tweak this: bluriness amount ...
+		float4 sum = cx * weight;
+		
+		float4 jitteredDir = vn.xyxy + noise.xyyz;
+#ifdef SHADER_API_D3D11
+		jitteredDir = max(abs(jitteredDir.xyxy), _MainTex_TexelSize.xyxy * _MaxVelocity * 0.5) * sign(jitteredDir.xyxy)  * float4(1,1,-1,-1);
+#else
+		jitteredDir = max(abs(jitteredDir.xyxy), _MainTex_TexelSize.xyxy * _MaxVelocity * 0.15) * sign(jitteredDir.xyxy)  * float4(1,1,-1,-1);
+#endif
+
+		for(int l=0; l<SmallDiscKernelSamples; l++)
+		{
+			float4 y = i.uv.xyxy + jitteredDir.xyxy * SmallDiscKernel[l].xyxy * float4(1,1,-1,-1);
+
+			float4 yf = y;
+			#if UNITY_UV_STARTS_AT_TOP
+			if (_MainTex_TexelSize.y < 0)
+	    		yf.yw = 1-yf.yw;
+			#endif
+
+			// velocity at y 
+			float2 vy = tex2Dlod(_VelTex, float4(yf.xy,0,0)).xy;
+
+			float zy = SAMPLE_DEPTH_TEXTURE_LOD(_CameraDepthTexture, float4(y.xy,0,0) ); 
+			zy = -Linear01Depth(zy);
+
+			float f = softDepthCompare(zx, zy);
+			float b = softDepthCompare(zy, zx);
+			float alphay = b * cone(x, y.xy, vx) + f * cone(y.xy, x, vy) +  cylinder(y.xy, x, vy) * cylinder(x, y.xy, vx) * 2.0;
+
+			float4 cy = tex2Dlod(_MainTex, float4(y.xy,0,0));
+			sum += cy * alphay;
+			weight += alphay;
+
+#ifdef SHADER_API_D3D11
+
+			vy = tex2Dlod(_VelTex, float4(yf.zw,0,0)).xy;
+
+			zy = SAMPLE_DEPTH_TEXTURE_LOD(_CameraDepthTexture, float4(y.zw,0,0) ); 
+			zy = -Linear01Depth(zy);
+
+			f = softDepthCompare(zx, zy);
+			b = softDepthCompare(zy, zx);
+			alphay = b * cone(x, y.zw, vx) + f * cone(y.zw, x, vy) +  cylinder(y.zw, x, vy) * cylinder(x, y.zw, vx) * 2.0;
+
+			cy = tex2Dlod(_MainTex, float4(y.zw,0,0));
+			sum += cy * alphay;
+			weight += alphay;
+			
+#endif
+		}
+
+		return sum / weight;
+	}
+
+	float4 MotionVectorBlur (v2f i) : SV_Target
 	{
 		float2 x = i.uv;
 
@@ -335,119 +418,99 @@
 	
 Subshader {
  
- // pass 0
- Pass {
-	  ZTest Always Cull Off ZWrite On Blend Off
-	  Fog { Mode off }      
+	// pass 0
+	Pass {
+		ZTest Always Cull Off ZWrite On Blend Off
 
-      CGPROGRAM
-	  #pragma target 3.0
-      #pragma vertex vert
-      #pragma fragment CameraVelocity
-      #pragma fragmentoption ARB_precision_hint_fastest
-      #pragma glsl
-      #pragma exclude_renderers d3d11_9x 
+		CGPROGRAM
+		#pragma target 3.0
+		#pragma vertex vert
+		#pragma fragment CameraVelocity
 
-      ENDCG
-  	}
+		ENDCG
+	}
 
- // pass 1
- Pass {
-	  ZTest Always Cull Off ZWrite Off Blend Off
-	  Fog { Mode off }      
+	// pass 1
+	Pass {
+		ZTest Always Cull Off ZWrite Off Blend Off
 
-      CGPROGRAM
-	  #pragma target 3.0
-      #pragma vertex vert
-      #pragma fragment Debug
-      #pragma fragmentoption ARB_precision_hint_fastest
-      #pragma glsl
-      #pragma exclude_renderers d3d11_9x 
+		CGPROGRAM
+		#pragma target 3.0
+		#pragma vertex vert
+		#pragma fragment Debug
 
-      ENDCG
-  	}
+		ENDCG
+	}
 
- // pass 2
- Pass {
-	  ZTest Always Cull Off ZWrite Off Blend Off
-	  Fog { Mode off }      
+	// pass 2
+	Pass {
+		ZTest Always Cull Off ZWrite Off Blend Off
 
-      CGPROGRAM
-	  #pragma target 3.0
-      #pragma vertex vert
-      #pragma fragment TileMax
-      #pragma fragmentoption ARB_precision_hint_fastest
-      #pragma glsl
-      #pragma exclude_renderers d3d11_9x       
+		CGPROGRAM
+		#pragma target 3.0
+		#pragma vertex vert
+		#pragma fragment TileMax
 
-      ENDCG
-  	}
+		ENDCG
+	}
 
- // pass 3
- Pass {
-	  ZTest Always Cull Off ZWrite Off Blend Off
-	  Fog { Mode off }      
+	// pass 3
+	Pass {
+		ZTest Always Cull Off ZWrite Off Blend Off
 
-      CGPROGRAM
-	  #pragma target 3.0
-      #pragma vertex vert
-      #pragma fragment NeighbourMax
-      #pragma fragmentoption ARB_precision_hint_fastest
-      #pragma glsl
-      #pragma exclude_renderers d3d11_9x       
+		CGPROGRAM
+		#pragma target 3.0
+		#pragma vertex vert
+		#pragma fragment NeighbourMax
 
-      ENDCG
-  	}
+		ENDCG
+	}
 
- // pass 4
- Pass {
-	  ZTest Always Cull Off ZWrite Off Blend Off
-	  Fog { Mode off }      
+	// pass 4
+	Pass {
+		ZTest Always Cull Off ZWrite Off Blend Off
 
-      CGPROGRAM
-	  #pragma target 3.0
-      #pragma vertex vert 
-      #pragma fragment ReconstructFilterBlur
-      #pragma fragmentoption ARB_precision_hint_fastest
-      #pragma glsl
-      #pragma exclude_renderers d3d11_9x       
+		CGPROGRAM
+		#pragma target 3.0
+		#pragma vertex vert 
+		#pragma fragment ReconstructFilterBlur
 
-      ENDCG
-  	}
+		ENDCG
+	}
 
- // pass 5
- Pass {
-	  ZTest Always Cull Off ZWrite Off Blend Off
-	  Fog { Mode off }      
- 
-      CGPROGRAM
-	  #pragma target 3.0
-      #pragma vertex vert
-      #pragma fragment SimpleBlur
-      #pragma fragmentoption ARB_precision_hint_fastest
-      #pragma glsl
-      #pragma exclude_renderers d3d11_9x       
+	// pass 5
+	Pass {
+		ZTest Always Cull Off ZWrite Off Blend Off
 
-      ENDCG
-  	}
+		CGPROGRAM
+		#pragma target 3.0
+		#pragma vertex vert
+		#pragma fragment SimpleBlur
+		ENDCG
+	}
 
-  // pass 6
- Pass {
-	  ZTest Always Cull Off ZWrite Off Blend Off
-	  Fog { Mode off }      
- 
-      CGPROGRAM
-	  #pragma target 3.0
-      #pragma vertex vert
-      #pragma fragment MotionVectorBlur
-      #pragma fragmentoption ARB_precision_hint_fastest
-      #pragma glsl
-      #pragma exclude_renderers d3d11_9x       
+  	// pass 6
+	Pass {
+		ZTest Always Cull Off ZWrite Off Blend Off
 
-      ENDCG
-  	}
+		CGPROGRAM
+		#pragma target 3.0
+		#pragma vertex vert
+		#pragma fragment MotionVectorBlur
+		ENDCG
+	}
+
+  	// pass 7
+	Pass {
+		ZTest Always Cull Off ZWrite Off Blend Off
+
+		CGPROGRAM
+		#pragma target 3.0
+		#pragma vertex vert
+		#pragma fragment ReconstructionDiscBlur
+		ENDCG
+	}  	
   }
-  
-Fallback off
 
+Fallback off
 }
