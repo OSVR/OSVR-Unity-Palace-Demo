@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 4a6bd310ebc6d5b4db0d703ca4cffbad
+guid: 06761168d91f06445b131d1817f46a48
 PluginImporter:
   serializedVersion: 1
   iconMap: {}
@@ -10,7 +10,7 @@ PluginImporter:
       enabled: 0
       settings: {}
     Editor:
-      enabled: 0
+      enabled: 1
       settings:
         CPU: x86_64
         DefaultValueInitialized: true
