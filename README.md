@@ -15,10 +15,17 @@ Add any [device plugins](http://osvr.github.io/using/) to the osvr-plugins-0 fol
 3) Connect your device to and start osvr_server.exe, not necessarily in that order.
 
 # RenderManager / DirectMode
-OSVR-Unity supports Direct Mode, Timewarp, and Distortion Correction via OSVR RenderManager. Direct Mode requires Unity 5.2+ and NVIDIA graphics cards with the latest drivers. NVIDIA specifies that a 700 series card or better is required, but our testing indicates that select lower cards may also be compatible. Tested and working on a 560M.
+OSVR-Unity supports Direct Mode, Timewarp, and Distortion Correction via OSVR RenderManager. Direct Mode requires Unity 5.2+ and NVIDIA graphics cards with the latest drivers* (364.xx drivers are not working at the time of this edit, revert to 362.00). NVIDIA specifies that a 700 series card or better is required, but our testing indicates that select lower cards may also be compatible. Tested and working on a 560M.
 
 #Android
 Here is an [Android apk](https://github.com/OSVR/OSVR-Unity-Palace-Demo/releases/tag/v0.1.1-android) built with this project.
 
 See the [Android branch README](https://github.com/OSVR/OSVR-Unity-Palace-Demo/blob/androidPalace/README.md) for more information.
 
+##Recent Changes
+### v0.6.8 
+> (April 6, 2016)
+
+- Update to OSVRUnity v0.6.8.
+- Changed to mobile/diffuse shader for most surfaces.
+- Removed fire particles and excessive lighting.
