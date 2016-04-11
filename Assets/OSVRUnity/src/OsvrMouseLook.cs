@@ -35,8 +35,7 @@ namespace OSVR
         {
             public KeyCode MouseLookToggleKey = KeyCode.M;
             public bool useMouseLook = false;
-            public enum RotationAxes { MouseXAndY = 0, MouseX = 1, MouseY = 2, RightJoystick = 3 }
-            public RotationAxes axes = RotationAxes.MouseXAndY;
+            public bool rotateXOnly = false;
             public float sensitivityX = 15F;
             public float sensitivityY = 15F;
 
@@ -69,7 +68,35 @@ namespace OSVR
                 {
                     return;
                 }
-                if (axes == RotationAxes.MouseXAndY)
+                float xAxis;
+                if (Mathf.Abs(Input.GetAxis("Right Joystick X")) > 0.15f)
+                {
+                    xAxis = Input.GetAxis("Right Joystick X") * sensitivityX;
+                }
+                else
+                {
+                    xAxis = Input.GetAxis("Mouse X") * sensitivityX;
+                }
+                float rotationX = transform.localEulerAngles.y +  xAxis;
+
+
+                if(!rotateXOnly)
+                {
+                    float yAxis;
+                    if (Mathf.Abs(Input.GetAxis("Right Joystick Y")) > 0.15f)
+                    {
+                        yAxis = -Input.GetAxis("Right Joystick Y");
+                    }
+                    else
+                    {
+                        yAxis = Input.GetAxis("Mouse Y") * sensitivityY;
+                    }
+                    rotationY += yAxis;
+                    rotationY = Mathf.Clamp(rotationY, minimumY, maximumY);
+                }
+                transform.localEulerAngles = new Vector3(-rotationY, rotationX, 0);
+
+                /*if (axes == RotationAxes.MouseXAndY)
                 {
                     float rotationX = transform.localEulerAngles.y + Input.GetAxis("Mouse X") * sensitivityX;
 
@@ -97,7 +124,7 @@ namespace OSVR
                     float rotationX = transform.localEulerAngles.y + Input.GetAxis("Mouse X") * sensitivityX;
 
                     transform.localEulerAngles = new Vector3(-rotationY, rotationX, 0);
-                }
+                }*/
             }
         }
     }
