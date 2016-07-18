@@ -23,6 +23,13 @@ Here is an [Android apk](https://github.com/OSVR/OSVR-Unity-Palace-Demo/releases
 See the [Android branch README](https://github.com/OSVR/OSVR-Unity-Palace-Demo/blob/androidPalace/README.md) for more information.
 
 ##Recent Changes
+### v0.6.10.12 
+> (July 18, 2016)
+
+- Update to OSVRUnity v0.6.10.12 (build 424)
+- Adds server autostart feature on Windows, toggled by boolean in ClientKit script.
+- Adds OSVR Editor Utilities
+
 ### v0.6.8 
 > (April 6, 2016)
 
