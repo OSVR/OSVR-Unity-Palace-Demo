@@ -192,7 +192,8 @@ namespace OSVR
                 //create RenderBuffers in RenderManager
                 if(UseRenderManager && RenderManager != null)
                 {
-                    RenderManager.ConstructBuffers();
+                    GL.IssuePluginEvent(RenderManager.GetRenderEventFunction(), 5);
+                   // RenderManager.ConstructBuffers();
                 }                          
                 SetRenderParams();
             }

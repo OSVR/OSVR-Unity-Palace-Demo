@@ -1,0 +1,3 @@
+[OSVR Rendering Plugin] OnGraphicsDeviceEvent(Initialize).
+
+OpenGL Initialize Event

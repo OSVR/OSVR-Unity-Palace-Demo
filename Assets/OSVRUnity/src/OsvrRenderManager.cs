@@ -111,7 +111,7 @@ namespace OSVR
             [DllImport(PluginName, CallingConvention = CallingConvention.Cdecl)]
             private static extern void ShutdownRenderManager();
 
-            private bool _linkDebug = false; //causes crash on exit if true, only enable for debugging
+            private bool _linkDebug = true; //causes crash on exit if true, only enable for debugging
 
             //persistent singleton
             private static OsvrRenderManager _instance;
