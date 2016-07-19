@@ -222,7 +222,7 @@ namespace OSVR
                             RenderTexture renderTexture = new RenderTexture(surface.Viewport.Width, surface.Viewport.Height, 24, RenderTextureFormat.Default);
                             if (QualitySettings.antiAliasing > 0)
                             {
-                                renderTexture.antiAliasing = QualitySettings.antiAliasing;
+                                renderTexture.antiAliasing = 1;
                             }
                             surface.SetRenderTexture(renderTexture);
                         }
@@ -269,7 +269,7 @@ namespace OSVR
                         RenderTexture renderTexture = new RenderTexture(surface.Viewport.Width, surface.Viewport.Height, 24, RenderTextureFormat.Default);
                         if (QualitySettings.antiAliasing > 0)
                         {
-                            renderTexture.antiAliasing = QualitySettings.antiAliasing;
+                            renderTexture.antiAliasing = 1;
                         }
                         surface.SetRenderTexture(renderTexture);                       
                     }             
