@@ -1,3 +1,56 @@
 [OSVR Rendering Plugin] OnGraphicsDeviceEvent(Initialize).
 
 OpenGL Initialize Event
+[OSVR Rendering Plugin] Context set
+[OSVR Rendering Plugin] kOsvrEventID_CreateRenderManager event.
+[OSVR Rendering Plugin] CreateRenderManagerFromPlugin
+[OSVR Rendering Plugin] Client context already set! Replacing...
+[OSVR Rendering Plugin] OpenGL Renderer
+[OSVR Rendering Plugin] OpenGL 1
+[OSVR Rendering Plugin] OpenGL 2
+[OSVR Rendering Plugin] OpenGL 3
+[OSVR] Interface initialized for /me/head
+[OSVR] Interface initialized for /me/head
+[OSVR] Interface initialized for /me/head
+[OSVR] Display: 
+[OSVR] Created an OSVR_DisplayConfigObject!
+RenderManager::createRenderManager(): Got Display info from server (ignore earlier errors that occured while we were waiting to connect)
+OSVRDisplayConfiguration::parse(): WARNING: Your display descriptor is outdated (using an outdated schema) and may not work with all applications. Please check with your vendor or the OSVR community to get an updated one matching the most recent JSON Schema for display descriptors.
+OSVRDisplayConfiguration::parse(): Using mono point sample distortion.
+OSVRDisplayConfiguration::parse(): Processing JSON data into mono point samples description structure.
+OSVRDisplayConfiguration::parse(): Initial processing complete. Loaded mono point samples data with 1581 and 1581 samples per eye, respectively.
+OSVRDisplayConfiguration::parse(): Using distortion method "mono_point_samples_built_in": "OSVR_HDK_20_V1"
+[OSVR] Connecting to default (local) host
+[OSVR] Client context initialized for com.osvr.renderManager
+[OSVR] Got connection to main OSVR server
+[OSVR] Got updated path tree, processing
+[OSVR] Connected 0 of 0 unconnected paths successfully
+[OSVR] Connection process took 98ms: have connection to server, have path tree
+[OSVR] Interface initialized for /me/head
+[OSVR] Constructed a TrackerHandler for com_osvr_Multiserver/OSVRHackerDevKit0@localhost:3883 sensor 0
+[OSVR] Successfully produced handler for /me/head
+[OSVR] Connecting to default (local) host
+[OSVR] Client context initialized for com.osvr.renderManager
+[OSVR] Got connection to main OSVR server
+[OSVR] Got updated path tree, processing
+[OSVR] Connected 0 of 0 unconnected paths successfully
+[OSVR] Connection process took 98ms: have connection to server, have path tree
+[OSVR] Interface initialized for /me/head
+[OSVR] Constructed a TrackerHandler for com_osvr_Multiserver/OSVRHackerDevKit0@localhost:3883 sensor 0
+[OSVR] Successfully produced handler for /me/head
+[OSVR Rendering Plugin] OpenGL 4
+OSVR RenderManager Warning: HDCP is disabled on nVidia
+[OSVR Rendering Plugin] OpenGL 5
+[OSVR Rendering Plugin] CreateRenderManagerFromUnity Success!
+[OSVR Rendering Plugin] SetColorBufferFromUnity
+[OSVR Rendering Plugin] SetColorBufferFromUnity
+[OSVR Rendering Plugin] Construct buffers event
+Create Buffer with Width: 1296 Height: 1440
+Create Buffer with Width: 1296 Height: 1440
+[OSVR] OSVR_DisplayConfigObject destructor
+[OSVR] Client context shut down for com.sensics.palacedemo
+[OSVR] OSVR_DisplayConfigObject destructor
+[OSVR Rendering Plugin] Shutting down RenderManager.
+[OSVR Rendering Plugin] OnGraphicsDeviceEvent(Shutdown).
+
+OpenGL Shutdown Event

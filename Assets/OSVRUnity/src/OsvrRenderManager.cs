@@ -78,6 +78,16 @@ namespace OSVR
             [DllImport(PluginName, CallingConvention = CallingConvention.Cdecl)]
             private static extern Byte ConstructRenderBuffers();
 
+            //get the render event function that we'll call every frame via GL.IssuePluginEvent
+            [DllImport(PluginName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern bool IsDisplayOpened();
+
+            [DllImport(PluginName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern bool IsBufferConstructed();
+
+            [DllImport(PluginName, CallingConvention = CallingConvention.Cdecl)]
+            private static extern void SetClientContext(OSVR.ClientKit.SafeClientContextHandle /*OSVR_ClientContext*/ ctx);
+
             [StructLayout(LayoutKind.Sequential)]
             public struct OSVR_ViewportDescription
             {
@@ -166,14 +176,29 @@ namespace OSVR
             //Initialize use of RenderManager via CreateRenderManager call
             public int InitRenderManager()
             {
+                LinkDebug();
+
+                return CreateRenderManager(ClientKit.instance.context);
+            }
+
+            public void LinkDebug()
+            {
                 if (_linkDebug)
                 {
                     //this will cause a crash when exiting the Unity editor or an application
                     //only use for debugging purposes, do not leave on for release.
                     LinkDebug(functionPointer); // Hook our c++ plugin into Unity's console log.
                 }
+            }
 
-                return CreateRenderManager(ClientKit.instance.context);
+            public bool GetRenderManagerDisplayOpened()
+            {
+                return IsDisplayOpened();
+            }
+
+            public void SetRenderManagerClientContext()
+            {
+                SetClientContext(ClientKit.instance.context.ContextHandle);
             }
 
             //Create and Register RenderBuffers in RenderManager

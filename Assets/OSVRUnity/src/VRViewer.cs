@@ -283,8 +283,9 @@ namespace OSVR
                 while (true)
                 {                  
                     yield return new WaitForEndOfFrame();
-                    if (DisplayController.UseRenderManager && DisplayController.CheckDisplayStartup())
+                    if (DisplayController.UseRenderManager && DisplayController.CheckDisplayStartup() && DisplayController.RenderManagerReady)
                     {
+
                         // Issue a RenderEvent, which copies Unity RenderTextures to RenderManager buffers
 #if UNITY_5_2 || UNITY_5_3 || UNITY_5_4
                         GL.Viewport(_emptyViewport);

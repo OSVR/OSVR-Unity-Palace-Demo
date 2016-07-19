@@ -60,6 +60,12 @@ namespace OSVR
             private OsvrRenderManager _renderManager;
             private bool _useRenderManager = false; //requires Unity 5.2+ and RenderManager configured osvr server
             public bool UseRenderManager { get { return _useRenderManager; } set { _useRenderManager = value; } }
+            private bool _rmDisplayOpened = false;
+            private bool _rmBuffersConstructed = false;
+            public bool RenderManagerReady
+            {
+                get { return _rmBuffersConstructed && _rmDisplayOpened; }
+            }
 
             public OSVR.ClientKit.DisplayConfig DisplayConfig
             {
@@ -137,12 +143,14 @@ namespace OSVR
                     else
                     {
                         // attempt to create a RenderManager in the plugin                                              
-                        int result = _renderManager.InitRenderManager();
-                        if (result != 0)
-                        {
-                            Debug.LogError("[OSVR-Unity] Failed to create RenderManager.");
-                            _useRenderManager = false;
-                        }
+                        /* int result = _renderManager.InitRenderManager();
+                         if (result != 0)
+                         {
+                             Debug.LogError("[OSVR-Unity] Failed to create RenderManager.");
+                             _useRenderManager = false;
+                         }*/
+                        RenderManager.SetRenderManagerClientContext();
+                        GL.IssuePluginEvent(RenderManager.GetRenderEventFunction(), 6);
                     }
                 }
                 else
@@ -187,15 +195,19 @@ namespace OSVR
                 SetResolution();
 
                 //create scene objects 
-                CreateHeadAndEyes();
+                //CreateHeadAndEyes();
 
-                //create RenderBuffers in RenderManager
                 if(UseRenderManager && RenderManager != null)
                 {
-                    GL.IssuePluginEvent(RenderManager.GetRenderEventFunction(), 5);
+                    RenderManager.LinkDebug();
+                }
+                //create RenderBuffers in RenderManager
+               if(UseRenderManager && RenderManager != null)
+                {
+                   // GL.IssuePluginEvent(RenderManager.GetRenderEventFunction(), 5);
                    // RenderManager.ConstructBuffers();
-                }                          
-                SetRenderParams();
+                }                         
+                //SetRenderParams();
             }
 
             //Set RenderManager rendering parameters: near and far clip plane distance and IPD
@@ -316,6 +328,24 @@ namespace OSVR
                 if (!_displayConfigInitialized)
                 {
                     SetupDisplay();
+                }
+
+                if(_useRenderManager && !_rmDisplayOpened)
+                {
+                    Debug.Log("Display not yet opened " + Time.time);
+                    _rmDisplayOpened = RenderManager.GetRenderManagerDisplayOpened();
+
+                    if (_rmDisplayOpened)
+                    {
+                        CreateHeadAndEyes();
+                    }
+                }
+                else if(_useRenderManager && _rmDisplayOpened && !_rmBuffersConstructed)
+                {
+                    Debug.Log("Const buffers.. " + Time.time);
+                    GL.IssuePluginEvent(RenderManager.GetRenderEventFunction(), 5);
+                    _rmBuffersConstructed = true;
+                    
                 }
             }
 
