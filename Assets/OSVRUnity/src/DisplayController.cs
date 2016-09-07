@@ -54,6 +54,7 @@ namespace OSVR
             private bool _displayConfigInitialized = false;
             private uint _totalDisplayWidth;
             private uint _totalSurfaceHeight;
+			private bool _osvrClientKitError = false;
 
             //variables for controlling use of osvrUnityRenderingPlugin.dll which enables DirectMode
             private OsvrRenderManager _renderManager;
@@ -65,46 +66,34 @@ namespace OSVR
                 get { return _displayConfig; }
                 set { _displayConfig = value; }
             }
+			
             public VRViewer[] Viewers { get { return _viewers; } }
             public uint ViewerCount { get { return _viewerCount; } }
             public OsvrRenderManager RenderManager { get { return _renderManager; } }
-            public bool showDirectModePreview = true; //should the monitor show what the user sees in the HMD?
+            [Tooltip("Renders an extra camera to show what the HMD user sees while in Direct Mode. Comes at a framerate cost until this feature becomes part of RenderManager.")]
+            public bool showDirectModePreview = false; //should the monitor show what the user sees in the HMD?
 
             public uint TotalDisplayWidth
             {
-                get
-                {
-                    return _totalDisplayWidth;
-                }
-
-                set
-                {
-                    _totalDisplayWidth = value;
-                }
+                get { return _totalDisplayWidth; }
+                set { _totalDisplayWidth = value; }
             }
 
             public uint TotalDisplayHeight
             {
-                get
-                {
-                    return _totalSurfaceHeight;
-                }
-
-                set
-                {
-                    _totalSurfaceHeight = value;
-                }
+                get { return _totalSurfaceHeight; }
+                set { _totalSurfaceHeight = value; }
             }
 
-            void Awake()
+            void Start()
             {
-                _clientKit = FindObjectOfType<ClientKit>();
+                _clientKit = ClientKit.instance;
                 if (_clientKit == null)
                 {
                     Debug.LogError("[OSVR-Unity] DisplayController requires a ClientKit object in the scene.");
                 }
-
-                SetupApplicationSettings();
+				
+				SetupApplicationSettings();
             }
 
             void SetupApplicationSettings()
@@ -132,8 +121,9 @@ namespace OSVR
                     _renderManager = GameObject.FindObjectOfType<OsvrRenderManager>();
                     if (_renderManager == null)
                     {
+                        GameObject renderManagerGameObject = new GameObject("RenderManager");
                         //add a RenderManager component
-                        _renderManager = gameObject.AddComponent<OsvrRenderManager>();
+                        _renderManager = renderManagerGameObject.AddComponent<OsvrRenderManager>();
                     }
 
                     //check to make sure Unity version and Graphics API are supported
@@ -166,11 +156,16 @@ namespace OSVR
             void SetupDisplay()
             {
                 //get the DisplayConfig object from ClientKit
-                if (_clientKit.context == null)
+                if (_clientKit == null || _clientKit.context == null)
                 {
-                    Debug.LogError("[OSVR-Unity] ClientContext is null. Can't setup display.");
+					if (!_osvrClientKitError)
+					{
+						Debug.LogError("[OSVR-Unity] ClientContext is null. Can't setup display.");
+						_osvrClientKitError = true;
+					}
                     return;
                 }
+				
                 _displayConfig = _clientKit.context.GetDisplayConfig();
                 if (_displayConfig == null)
                 {
@@ -193,6 +188,12 @@ namespace OSVR
 
                 //create scene objects 
                 CreateHeadAndEyes();
+
+                //create RenderBuffers in RenderManager
+                if(UseRenderManager && RenderManager != null)
+                {
+                    RenderManager.ConstructBuffers();
+                }                          
                 SetRenderParams();
             }
 
@@ -325,7 +326,7 @@ namespace OSVR
 
             public bool CheckDisplayStartup()
             {
-                return _displayConfigInitialized && DisplayConfig.CheckDisplayStartup();
+                return DisplayConfig != null && _displayConfigInitialized && DisplayConfig.CheckDisplayStartup();
             }
 
             public void ExitRenderManager()

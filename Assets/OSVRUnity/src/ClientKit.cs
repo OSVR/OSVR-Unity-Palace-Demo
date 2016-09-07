@@ -30,10 +30,16 @@ namespace OSVR
             public string AppID;
 
             private OSVR.ClientKit.ClientContext _contextObject;
+#if UNITY_STANDALONE_WIN
+            private OSVR.ClientKit.ServerAutoStarter _serverAutoStarter;
+
+            public bool autoStartServer = true;
+#endif
 
             /// Uses the Unity "Persistent Singleton" pattern, see http://unitypatterns.com/singletons/
             private static ClientKit _instance;
             private bool _osvrServerError = false;
+			private bool _dllFixed = false;
 
             /// <summary>
             /// Use to access the single instance of this object/script in your game.
@@ -73,6 +79,12 @@ namespace OSVR
 
             private void EnsureStarted()
             {
+				if (!_dllFixed)
+                {
+                    DLLSearchPathFixer.fix();
+                    _dllFixed = true;
+                }
+				
                 if (_contextObject == null)
                 {
                     if (0 == AppID.Length)
@@ -81,8 +93,15 @@ namespace OSVR
                         AppID = "com.osvr.osvr-unity.dummy";
                     }
                     Debug.Log("[OSVR-Unity] Starting with app ID: " + AppID);
-                    _contextObject = new OSVR.ClientKit.ClientContext(AppID, 0);
+                    _contextObject = new OSVR.ClientKit.ClientContext(AppID, 0);                  
                 }
+
+#if UNITY_STANDALONE_WIN
+                if(_serverAutoStarter == null && autoStartServer)
+                {
+                    _serverAutoStarter = new OSVR.ClientKit.ServerAutoStarter();
+                }
+#endif
 
                 //check if the server is running
                 if (!_contextObject.CheckStatus())
@@ -102,12 +121,11 @@ namespace OSVR
 
             void Awake()
             {
-                DLLSearchPathFixer.fix();
                 //if an instance of this singleton does not exist, set the instance to this object and make it persist
                 if(_instance == null)
                 {
                     _instance = this;
-                    DontDestroyOnLoad(this);
+					DontDestroyOnLoad(this);
                 }
                 else
                 {
@@ -118,6 +136,7 @@ namespace OSVR
                     }
                 }
             }
+			
             void Start()
             {
                 Debug.Log("[OSVR-Unity] In Start()");
@@ -140,13 +159,26 @@ namespace OSVR
             {
                 _contextObject.update();
             }
+			
             void Stop()
-            {
-                if (null != _contextObject)
+        {
+                // Only stop the main instance, since it is the only one that
+                // ever actually starts-up.
+                if (this == instance)
                 {
-                    Debug.Log("[OSVR-Unity] Shutting down OSVR.");
-                    _contextObject.Dispose();
-                    _contextObject = null;
+                    if (null != _contextObject)
+                    {
+                        Debug.Log("[OSVR-Unity] Shutting down OSVR.");
+                        _contextObject.Dispose();
+                        _contextObject = null;
+#if UNITY_STANDALONE_WIN
+                        if(_serverAutoStarter != null)
+                        {
+                            _serverAutoStarter.Dispose();
+                            _serverAutoStarter = null;
+                        }
+#endif
+                    }
                 }
             }
 

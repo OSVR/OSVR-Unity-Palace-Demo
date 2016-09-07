@@ -58,6 +58,7 @@ namespace OSVR
             private bool _disabledCamera = true;
             private bool _hmdConnectionError = false;
             private Rect _emptyViewport = new Rect(0, 0, 0, 0);
+			private IEnumerator _endOfFrameCoroutine;
 
             #endregion
 
@@ -68,27 +69,35 @@ namespace OSVR
 
             void Init()
             {
-                _camera = GetComponent<Camera>();
-                //cache:
-                cachedTransform = transform;
-                if (DisplayController == null)
-                {
-                    DisplayController = FindObjectOfType<DisplayController>();
-                }
+				if (_camera == null)
+				{
+					_camera = GetComponent<Camera>();
+					//cache:
+					cachedTransform = transform;
+					if (DisplayController == null)
+					{
+						DisplayController = FindObjectOfType<DisplayController>();
+					}
+					
+					_endOfFrameCoroutine = EndOfFrame();
+				}
             }
 
             void OnEnable()
             {
-                StartCoroutine("EndOfFrame");
+                Init();
+				
+				if (DisplayController != null)
+					StartCoroutine(_endOfFrameCoroutine);
             }
 
             void OnDisable()
             {
-                StopCoroutine("EndOfFrame");
-                if (DisplayController.UseRenderManager && DisplayController.RenderManager != null)
-                {
-                    DisplayController.ExitRenderManager();
-                }
+				if (DisplayController != null)
+				{
+					StopCoroutine(_endOfFrameCoroutine);
+                    //@todo any cleanup of RenderTextures necessary here?
+				}
             }
 
             //Creates the Eyes of this Viewer
@@ -279,12 +288,13 @@ namespace OSVR
                         // Issue a RenderEvent, which copies Unity RenderTextures to RenderManager buffers
 #if UNITY_5_2 || UNITY_5_3 || UNITY_5_4
                         GL.Viewport(_emptyViewport);
-                        GL.Clear(false, true, Camera.backgroundColor);
+                        GL.Clear(false, true, Camera.backgroundColor);                      
                         GL.IssuePluginEvent(DisplayController.RenderManager.GetRenderEventFunction(), OsvrRenderManager.RENDER_EVENT); 
                         if(DisplayController.showDirectModePreview)
                         {
                             Camera.Render();
-                        }                      
+                        } 
+                                             
 #else
                         Debug.LogError("[OSVR-Unity] GL.IssuePluginEvent failed. This version of Unity cannot support RenderManager.");
                         DisplayController.UseRenderManager = false;

@@ -124,7 +124,6 @@ namespace OSVR
                         surface.SetProjectionMatrix(Viewer.DisplayController.RenderManager.GetEyeProjectionMatrix((int)EyeIndex));
                    
                         surface.Render();
-                        surface.SetActiveRenderTexture();
                     }
                     else
                     {
@@ -221,6 +220,10 @@ namespace OSVR
 
                             //create a RenderTexture for this eye's camera to render into
                             RenderTexture renderTexture = new RenderTexture(surface.Viewport.Width, surface.Viewport.Height, 24, RenderTextureFormat.Default);
+                            if (QualitySettings.antiAliasing > 0)
+                            {
+                                renderTexture.antiAliasing = QualitySettings.antiAliasing;
+                            }
                             surface.SetRenderTexture(renderTexture);
                         }
                     }
@@ -264,6 +267,10 @@ namespace OSVR
 
                         //create a RenderTexture for this eye's camera to render into
                         RenderTexture renderTexture = new RenderTexture(surface.Viewport.Width, surface.Viewport.Height, 24, RenderTextureFormat.Default);
+                        if (QualitySettings.antiAliasing > 0)
+                        {
+                            renderTexture.antiAliasing = QualitySettings.antiAliasing;
+                        }
                         surface.SetRenderTexture(renderTexture);                       
                     }             
                 }

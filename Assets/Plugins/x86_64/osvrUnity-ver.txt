@@ -1,0 +1,1 @@
+OSVR-Unity-v0.6.12-5-g91ec387-with-core-v0.6-1317-g80ee6b5-build450 
