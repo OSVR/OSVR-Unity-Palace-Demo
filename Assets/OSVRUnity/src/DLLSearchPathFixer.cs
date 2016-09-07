@@ -39,15 +39,7 @@ namespace OSVR
 
                 var fixer = new DLLSearchPathFixer();
                 fixer.ConditionallyAddRelativeDir("Plugins");
-                if(Application.platform == RuntimePlatform.Android)
-                {
-                    fixer.ConditionallyAddRelativeDir(new List<String>() { "Plugins", "Android", "libs", "armeabi-v7a"});
-                }
-                else
-                {
-                    fixer.ConditionallyAddRelativeDir(new List<String>() { "Plugins", IntPtr.Size == 4 ? "x86" : "x86_64" });
-                }
-                
+                fixer.ConditionallyAddRelativeDir(new List<String>() { "Plugins", IntPtr.Size == 4 ? "x86" : "x86_64" });
                 fixer.ApplyChanges();
             }
 
