@@ -1,1 +1,1 @@
-OSVR-Unity-v0.6.15-with-core-v0.6-1328-g3a449d7-build547 
+OSVR-Unity-v0.6.15-with-core-v0.6-1337-g9292631-build554 
