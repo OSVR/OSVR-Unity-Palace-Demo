@@ -1,6 +1,22 @@
 fileFormatVersion: 2
-guid: b1b3d8430114a784f856fe9a70b89af0
-DefaultImporter:
+guid: 3c6c37c48b815e847a1144c8fc1d45c2
+PluginImporter:
+  serializedVersion: 1
+  iconMap: {}
+  executionOrder: {}
+  isPreloaded: 0
+  platformData:
+    Android:
+      enabled: 1
+      settings:
+        CPU: ARMv7
+    Any:
+      enabled: 0
+      settings: {}
+    Editor:
+      enabled: 0
+      settings:
+        DefaultValueInitialized: true
   userData: 
   assetBundleName: 
   assetBundleVariant: 

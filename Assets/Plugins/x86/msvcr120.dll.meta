@@ -1,6 +1,51 @@
 fileFormatVersion: 2
-guid: 297706285e404664082fb99dd2b852f9
-DefaultImporter:
+guid: 945e08657d2c5044dae0fda1fdcffa4a
+PluginImporter:
+  serializedVersion: 1
+  iconMap: {}
+  executionOrder: {}
+  isPreloaded: 0
+  platformData:
+    Any:
+      enabled: 1
+      settings: {}
+    Editor:
+      enabled: 0
+      settings:
+        CPU: x86
+        DefaultValueInitialized: true
+    Linux:
+      enabled: 1
+      settings:
+        CPU: x86
+    Linux64:
+      enabled: 0
+      settings:
+        CPU: None
+    LinuxUniversal:
+      enabled: 1
+      settings:
+        CPU: x86
+    OSXIntel:
+      enabled: 1
+      settings:
+        CPU: AnyCPU
+    OSXIntel64:
+      enabled: 0
+      settings:
+        CPU: None
+    OSXUniversal:
+      enabled: 0
+      settings:
+        CPU: x86
+    Win:
+      enabled: 1
+      settings:
+        CPU: AnyCPU
+    Win64:
+      enabled: 0
+      settings:
+        CPU: None
   userData: 
   assetBundleName: 
   assetBundleVariant: 
