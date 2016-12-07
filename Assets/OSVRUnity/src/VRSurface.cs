@@ -26,6 +26,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using System.Collections;
 using System.Runtime.InteropServices;
+using System;
 
 namespace OSVR
 {
@@ -139,7 +140,7 @@ namespace OSVR
                 RenderTexture.active = RenderToTexture;
                 
                 //Set the native texture pointer so we can access this texture from the plugin
-                Eye.Viewer.DisplayController.RenderManager.SetEyeColorBuffer(RenderToTexture.GetNativeTexturePtr(), (int)Eye.EyeIndex);
+                Eye.Viewer.DisplayController.RenderManager.SetEyeColorBuffer(RenderToTexture.GetNativeTexturePtr(), (Byte)Eye.EyeIndex);
             }
             public RenderTexture GetRenderTexture()
             {

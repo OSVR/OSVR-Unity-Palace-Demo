@@ -117,11 +117,11 @@ namespace OSVR
                     //get viewport from ClientKit and set surface viewport
                     if (Viewer.DisplayController.UseRenderManager)
                     {
-                        viewport = Viewer.DisplayController.RenderManager.GetEyeViewport((int)EyeIndex);
+                        viewport = Viewer.DisplayController.RenderManager.GetEyeViewport((Byte)EyeIndex);
                         surface.SetViewportRect(Math.ConvertViewportRenderManager(viewport));
 
                         //get projection matrix from RenderManager and set surface projection matrix
-                        surface.SetProjectionMatrix(Viewer.DisplayController.RenderManager.GetEyeProjectionMatrix((int)EyeIndex));
+                        surface.SetProjectionMatrix(Viewer.DisplayController.RenderManager.GetEyeProjectionMatrix((Byte)EyeIndex));
                    
                         surface.Render();
                     }
@@ -129,11 +129,11 @@ namespace OSVR
                     {
                         //get viewport from ClientKit and set surface viewport
                         viewport = Viewer.DisplayController.DisplayConfig.GetRelativeViewportForViewerEyeSurface(
-                            Viewer.ViewerIndex, (byte)_eyeIndex, surfaceIndex);
+                            Viewer.ViewerIndex, (Byte)_eyeIndex, surfaceIndex);
 
-                        int displayInputIndex = Viewer.DisplayController.DisplayConfig.GetViewerEyeSurfaceDisplayInputIndex(Viewer.ViewerIndex, (byte)_eyeIndex, surfaceIndex);
+                        int displayInputIndex = Viewer.DisplayController.DisplayConfig.GetViewerEyeSurfaceDisplayInputIndex(Viewer.ViewerIndex, (Byte)_eyeIndex, surfaceIndex);
                         int numDisplayInputs = Viewer.DisplayController.DisplayConfig.GetNumDisplayInputs();
-                        surface.SetViewportRect(Math.ConvertViewport(viewport, Viewer.DisplayController.DisplayConfig.GetDisplayDimensions((byte)displayInputIndex),
+                        surface.SetViewportRect(Math.ConvertViewport(viewport, Viewer.DisplayController.DisplayConfig.GetDisplayDimensions((Byte)displayInputIndex),
                             numDisplayInputs, (int)_eyeIndex, (int)Viewer.DisplayController.TotalDisplayWidth));
 
                         //get projection matrix from ClientKit and set surface projection matrix
@@ -216,7 +216,7 @@ namespace OSVR
                         //render manager
                         if (Viewer.DisplayController.UseRenderManager)
                         {
-                            surface.SetViewport(Viewer.DisplayController.RenderManager.GetEyeViewport((int)EyeIndex));
+                            surface.SetViewport(Viewer.DisplayController.RenderManager.GetEyeViewport((Byte)EyeIndex));
 
                             //create a RenderTexture for this eye's camera to render into
                             RenderTexture renderTexture = new RenderTexture(surface.Viewport.Width, surface.Viewport.Height, 24, RenderTextureFormat.Default);
@@ -263,7 +263,7 @@ namespace OSVR
                     if(Viewer.DisplayController.UseRenderManager)
                     {
                         //Set the surfaces viewport from RenderManager
-                        surface.SetViewport(Viewer.DisplayController.RenderManager.GetEyeViewport((int)EyeIndex));
+                        surface.SetViewport(Viewer.DisplayController.RenderManager.GetEyeViewport((Byte)EyeIndex));
 
                         //create a RenderTexture for this eye's camera to render into
                         RenderTexture renderTexture = new RenderTexture(surface.Viewport.Width, surface.Viewport.Height, 24, RenderTextureFormat.Default);
