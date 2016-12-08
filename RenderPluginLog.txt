@@ -1,0 +1,33 @@
+[OSVR Rendering Plugin] OnGraphicsDeviceEvent(Initialize).
+
+[OSVR Rendering Plugin] Passed Unity device/context to RenderManager library.
+OSVRDisplayConfiguration::parse(): Using mono point sample distortion.
+OSVRDisplayConfiguration::parse(): Processing JSON data into mono point samples description structure.
+OSVRDisplayConfiguration::parse(): Initial processing complete. Loaded mono point samples data with 1581 and 1581 samples per eye, respectively.
+OSVRDisplayConfiguration::parse(): Using distortion method "mono_point_samples_built_in": "OSVR_HDK_20_V1"
+[OSVR Rendering Plugin] CreateRenderManagerFromUnity Success!
+[OSVR Rendering Plugin] SetColorBufferFromUnity
+[OSVR Rendering Plugin] SetColorBufferFromUnity
+[OSVR Rendering Plugin] ConstructBuffersD3D11
+[OSVR Rendering Plugin] ConstructBuffersD3D11
+[OSVR Rendering Plugin] Shutting down RenderManager.
+OSVRDisplayConfiguration::parse(): Using mono point sample distortion.
+OSVRDisplayConfiguration::parse(): Processing JSON data into mono point samples description structure.
+OSVRDisplayConfiguration::parse(): Initial processing complete. Loaded mono point samples data with 1581 and 1581 samples per eye, respectively.
+OSVRDisplayConfiguration::parse(): Using distortion method "mono_point_samples_built_in": "OSVR_HDK_20_V1"
+[OSVR Rendering Plugin] CreateRenderManagerFromUnity Success!
+[OSVR Rendering Plugin] SetColorBufferFromUnity
+[OSVR Rendering Plugin] SetColorBufferFromUnity
+[OSVR Rendering Plugin] ConstructBuffersD3D11
+[OSVR Rendering Plugin] ConstructBuffersD3D11
+[OSVR Rendering Plugin] Shutting down RenderManager.
+OSVRDisplayConfiguration::parse(): Using mono point sample distortion.
+OSVRDisplayConfiguration::parse(): Processing JSON data into mono point samples description structure.
+OSVRDisplayConfiguration::parse(): Initial processing complete. Loaded mono point samples data with 1581 and 1581 samples per eye, respectively.
+OSVRDisplayConfiguration::parse(): Using distortion method "mono_point_samples_built_in": "OSVR_HDK_20_V1"
+[OSVR Rendering Plugin] CreateRenderManagerFromUnity Success!
+[OSVR Rendering Plugin] SetColorBufferFromUnity
+[OSVR Rendering Plugin] SetColorBufferFromUnity
+[OSVR Rendering Plugin] ConstructBuffersD3D11
+[OSVR Rendering Plugin] ConstructBuffersD3D11
+[OSVR Rendering Plugin] Shutting down RenderManager.
