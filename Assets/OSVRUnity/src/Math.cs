@@ -79,6 +79,14 @@ namespace OSVR
             }
             public static Rect ConvertViewportRenderManager(OSVR.ClientKit.Viewport viewport)
             {
+                if(viewport.Width == 0)
+                {
+                    Debug.Log("Viewport width is 0 ");
+                }
+                if(viewport.Height == 0)
+                {
+                    Debug.Log("Viewport height is 0 ");
+                }
                 //Unity expects normalized coordinates, not pixel coordinates
                 //@todo below assumes left and right eyes split the screen in half horizontally
                 return new Rect(viewport.Left / viewport.Width, viewport.Bottom / viewport.Height, viewport.Width / viewport.Width, 1);
