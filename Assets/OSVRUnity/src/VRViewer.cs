@@ -25,9 +25,9 @@ namespace OSVR
 {
     namespace Unity
     {
-        [RequireComponent(typeof(Camera))]
+        [RequireComponent(typeof(Camera))]  
         public class VRViewer : MonoBehaviour
-        {
+        {   
             #region Public Variables         
             public DisplayController DisplayController { get { return _displayController; } set { _displayController = value; } }
             public VREye[] Eyes { get { return _eyes; } }
@@ -58,7 +58,7 @@ namespace OSVR
             private bool _disabledCamera = true;
             private bool _hmdConnectionError = false;
             private Rect _emptyViewport = new Rect(0, 0, 0, 0);
-            private IEnumerator _endOfFrameCoroutine;
+			private IEnumerator _endOfFrameCoroutine;
 
             #endregion
 
@@ -69,35 +69,35 @@ namespace OSVR
 
             void Init()
             {
-                if (_camera == null)
-                {
-                    _camera = GetComponent<Camera>();
-                    //cache:
-                    cachedTransform = transform;
-                    if (DisplayController == null)
-                    {
-                        DisplayController = FindObjectOfType<DisplayController>();
-                    }
-
-                    _endOfFrameCoroutine = EndOfFrame();
-                }
+				if (_camera == null)
+				{
+					_camera = GetComponent<Camera>();
+					//cache:
+					cachedTransform = transform;
+					if (DisplayController == null)
+					{
+						DisplayController = FindObjectOfType<DisplayController>();
+					}
+					
+					_endOfFrameCoroutine = EndOfFrame();
+				}
             }
 
             void OnEnable()
             {
                 Init();
-
-                if (DisplayController != null)
-                    StartCoroutine(_endOfFrameCoroutine);
+				
+				if (DisplayController != null)
+					StartCoroutine(_endOfFrameCoroutine);
             }
 
             void OnDisable()
             {
-                if (DisplayController != null)
-                {
-                    StopCoroutine(_endOfFrameCoroutine);
+				if (DisplayController != null)
+				{
+					StopCoroutine(_endOfFrameCoroutine);
                     //@todo any cleanup of RenderTextures necessary here?
-                }
+				}
             }
 
             //Creates the Eyes of this Viewer
@@ -121,7 +121,7 @@ namespace OSVR
                         // get the VREye gameobject
                         GameObject eyeGameObject = eye.gameObject;
                         eyeGameObject.name = "VREye" + eyeIndex;
-                        eye.Viewer = this;
+                        eye.Viewer = this; 
                         eye.EyeIndex = eyeIndex; //set the eye's index
                         eyeGameObject.transform.parent = DisplayController.transform; //child of DisplayController
                         eyeGameObject.transform.localPosition = Vector3.zero;
@@ -134,7 +134,7 @@ namespace OSVR
 
                 for (; eyeIndex < _eyeCount; eyeIndex++)
                 {
-                    if (foundEyes == 0)
+                    if(foundEyes == 0)
                     {
                         GameObject eyeGameObject = new GameObject("Eye" + eyeIndex); //add an eye gameobject to the scene
                         VREye eye = eyeGameObject.AddComponent<VREye>(); //add the VReye component
@@ -164,7 +164,7 @@ namespace OSVR
                         uint eyeSurfaceCount = DisplayController.DisplayConfig.GetNumSurfacesForViewerEye(ViewerIndex, (byte)eyeIndex);
                         eye.CreateSurfaces(eyeSurfaceCount);
                     }
-
+                    
                 }
             }
 
@@ -184,13 +184,28 @@ namespace OSVR
             //Update the pose of each eye, then update and render each eye's surfaces
             public void UpdateEyes()
             {
-                for (uint eyeIndex = 0; eyeIndex < EyeCount; eyeIndex++)
+                if (DisplayController.UseRenderManager)
                 {
+                    //Update RenderInfo
+#if UNITY_5_2 || UNITY_5_3 || UNITY_5_4 || UNITY_5_5 || UNITY_5_6
+                    GL.IssuePluginEvent(DisplayController.RenderManager.GetRenderEventFunction(), OsvrRenderManager.UPDATE_RENDERINFO_EVENT);
+#else
+                    Debug.LogError("[OSVR-Unity] GL.IssuePluginEvent failed. This version of Unity cannot support RenderManager.");
+                    DisplayController.UseRenderManager = false;
+#endif
+                }
+                else
+                {
+                    DisplayController.UpdateClient();
+                }
+                    
+                for (uint eyeIndex = 0; eyeIndex < EyeCount; eyeIndex++)
+                {                   
                     //update the eye pose
                     VREye eye = Eyes[eyeIndex];
 
                     if (DisplayController.UseRenderManager)
-                    {
+                    { 
                         //get eye pose from RenderManager                     
                         eye.UpdateEyePose(DisplayController.RenderManager.GetRenderManagerEyePose((byte)eyeIndex));
                     }
@@ -199,10 +214,10 @@ namespace OSVR
                         //get eye pose from DisplayConfig
                         eye.UpdateEyePose(_displayController.DisplayConfig.GetViewerEyePose(ViewerIndex, (byte)eyeIndex));
                     }
-
+                        
 
                     // update the eye's surfaces, includes call to Render
-                    eye.UpdateSurfaces();
+                    eye.UpdateSurfaces();                   
                 }
             }
 
@@ -241,7 +256,7 @@ namespace OSVR
                 // update poses once DisplayConfig is ready
                 if (DisplayController.CheckDisplayStartup())
                 {
-                    if (_hmdConnectionError)
+                    if(_hmdConnectionError)
                     {
                         _hmdConnectionError = false;
                         Debug.Log("[OSVR-Unity] HMD connection established. You can ignore previous error messages indicating Display Startup failure.");
@@ -257,14 +272,14 @@ namespace OSVR
                 }
                 else
                 {
-                    if (!_hmdConnectionError)
+                    if(!_hmdConnectionError)
                     {
                         //report an error message once if the HMD is not connected
                         //it can take a few frames to connect under normal operation, so inidcate when this error has been resolved
                         _hmdConnectionError = true;
                         Debug.LogError("[OSVR-Unity] Display Startup failed. Check HMD connection.");
                     }
-
+                    
                 }
             }
 
@@ -272,29 +287,24 @@ namespace OSVR
             IEnumerator EndOfFrame()
             {
                 while (true)
-                {
+                {                  
                     yield return new WaitForEndOfFrame();
                     if (DisplayController.UseRenderManager && DisplayController.CheckDisplayStartup())
                     {
                         // Issue a RenderEvent, which copies Unity RenderTextures to RenderManager buffers
 #if UNITY_5_2 || UNITY_5_3 || UNITY_5_4 || UNITY_5_5 || UNITY_5_6
-                        GL.IssuePluginEvent(DisplayController.RenderManager.GetRenderEventFunction(), OsvrRenderManager.UPDATE_RENDERINFO_EVENT);
                         GL.Viewport(_emptyViewport);
-                        GL.Clear(false, true, Camera.backgroundColor);
-                        GL.IssuePluginEvent(DisplayController.RenderManager.GetRenderEventFunction(), OsvrRenderManager.RENDER_EVENT);
-                        if (DisplayController.showDirectModePreview)
+                        GL.Clear(false, true, Camera.backgroundColor);                      
+                        GL.IssuePluginEvent(DisplayController.RenderManager.GetRenderEventFunction(), OsvrRenderManager.RENDER_EVENT); 
+                        if(DisplayController.showDirectModePreview)
                         {
                             Camera.Render();
-                        }
-
+                        } 
+                                             
 #else
                         Debug.LogError("[OSVR-Unity] GL.IssuePluginEvent failed. This version of Unity cannot support RenderManager.");
                         DisplayController.UseRenderManager = false;
 #endif
-                    }
-                    else
-                    {
-                        DisplayController.UpdateClient();
                     }
                     //if we disabled the dummy camera, enable it here
                     if (_disabledCamera)
@@ -305,10 +315,10 @@ namespace OSVR
                     //Sends queued-up commands in the driver's command buffer to the GPU.
                     //only accessible in Unity 5.4+ API
 #if !(UNITY_5_3 || UNITY_5_2 || UNITY_5_1 || UNITY_5_0 || UNITY_4_7 || UNITY_4_6)
-                    GL.Flush();
+                GL.Flush();
 #endif
                 }
-            }
+            }             
         }
     }
 }
