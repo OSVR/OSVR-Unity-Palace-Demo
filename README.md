@@ -22,40 +22,10 @@ Here is an [Android apk](https://github.com/OSVR/OSVR-Unity-Palace-Demo/releases
 
 See the [Android branch README](https://github.com/OSVR/OSVR-Unity-Palace-Demo/blob/androidPalace/README.md) for more information.
 
-##Version Changes
-### v0.6.10.12 
-> (July 18, 2016)
+##Recent Changes
+### v0.6.16.4
+> (March 9, 2017)
 
-- Update to OSVRUnity v0.6.10.12 (build 424)
-- Adds server autostart feature on Windows, toggled by boolean in ClientKit script.
-- Adds OSVR Editor Utilities
-
-### v0.6.9
-> (June 9, 2016)
-
-- Update to OSVR-Unity v0.6.9, fixes scene switching bug in direct mode.
-
-### v0.6.8.6
-> (May 31, 2016)
-
-- Update to RenderManager v00_06_43-81, which includes new distortion mesh
-
-### v0.6.8.5
-> (May 23, 2016)
-
-- Update to OSVRUnity v0.6.8.2.
-- Update to RenderManager v00_06_43-66
-- Fixed colored table bug.
-
-### v0.6.8.2
-> (April 22, 2016)
-
-- Update to OSVRUnity v0.6.8.2.
-- Fixed bug causing startup hangup on some systems
-
-### v0.6.8 
-> (April 6, 2016)
-
-- Update to OSVRUnity v0.6.8.
-- Changed to mobile/diffuse shader for most surfaces.
-- Removed fire particles and excessive lighting.
+- Update to OSVRUnity v0.6.16.3 (build 612)
+- Fixes random crash on some systems
+- Re-baked Occlusion maps
