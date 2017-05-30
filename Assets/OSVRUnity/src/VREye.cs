@@ -217,7 +217,7 @@ namespace OSVR
                         if (Viewer.DisplayController.UseRenderManager)
                         {
                             surface.SetViewport(Viewer.DisplayController.RenderManager.GetEyeViewport((int)EyeIndex));
-
+                            Debug.Log("[OSVR-Unity] Created Eye " + EyeIndex + " width: " + surface.Viewport.Width + " height: " + surface.Viewport.Height);
                             //create a RenderTexture for this eye's camera to render into
                             RenderTexture renderTexture = new RenderTexture(surface.Viewport.Width, surface.Viewport.Height, 24, RenderTextureFormat.Default);
                             if (QualitySettings.antiAliasing > 0)
@@ -264,6 +264,7 @@ namespace OSVR
                     {
                         //Set the surfaces viewport from RenderManager
                         surface.SetViewport(Viewer.DisplayController.RenderManager.GetEyeViewport((int)EyeIndex));
+                        Debug.Log("[OSVR-Unity] Created Eye " + EyeIndex + " width: " + surface.Viewport.Width + " height: " + surface.Viewport.Height);
 
                         //create a RenderTexture for this eye's camera to render into
                         RenderTexture renderTexture = new RenderTexture(surface.Viewport.Width, surface.Viewport.Height, 24, RenderTextureFormat.Default);

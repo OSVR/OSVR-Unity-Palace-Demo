@@ -62,7 +62,7 @@ namespace OSVR
             public const int RENDER_EVENT = 0;
             public const int SHUTDOWN_EVENT = 1;
             public const int UPDATE_RENDERINFO_EVENT = 2;
-            private const string PluginName = "osvrUnityRenderingPlugin";
+            private const string PluginName = "osvrUnityAndroidRenderingPlugin";
 
             [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             private delegate void DebugLog(string log);
@@ -191,6 +191,7 @@ namespace OSVR
                     //only use for debugging purposes, do not leave on for release.
                     LinkDebug(functionPointer); // Hook our c++ plugin into Unity's console log.
                 }
+                Debug.LogError("[OSVR-Unity] After linkdebug, create rendermanager next");
 
                 return CreateRenderManager(ClientKit.instance.context);
             }
@@ -238,7 +239,9 @@ namespace OSVR
             //Get the pose of a given eye from RenderManager
             public OSVR.ClientKit.Pose3 GetRenderManagerEyePose(int eye)
             {
-                return GetEyePose(eye);
+                OSVR.ClientKit.Pose3 p = GetEyePose(eye);
+                Debug.Log("[OSVR-Unity] RM Eye " + eye + " pose: (" + p.rotation.x +", " + p.rotation.y + ", " + p.rotation.z + ", " + p.rotation.w + ")");
+                return p;
             }
 
             //Get the viewport of a given eye from RenderManager
@@ -333,10 +336,12 @@ namespace OSVR
             public bool IsRenderManagerSupported()
             {
                 bool support = true;
+                /*
 #if UNITY_ANDROID
                 Debug.Log("[OSVR-Unity] RenderManager not yet supported on Android.");
                 support = false;
 #endif
+*/
                 if (!SystemInfo.graphicsDeviceVersion.Contains("OpenGL") && !SystemInfo.graphicsDeviceVersion.Contains("Direct3D 11"))
                 {
                     Debug.LogError("[OSVR-Unity] RenderManager not supported on " +

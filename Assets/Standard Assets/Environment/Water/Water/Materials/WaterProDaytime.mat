@@ -31,20 +31,6 @@ Material:
           m_Offset: {x: 0, y: 0}
       data:
         first:
-          name: _ReflectionTex
-        second:
-          m_Texture: {fileID: 0}
-          m_Scale: {x: 1, y: 1}
-          m_Offset: {x: 0, y: 0}
-      data:
-        first:
-          name: _ReflectiveColorCube
-        second:
-          m_Texture: {fileID: 8900000, guid: 9cda328e4b6954d70841a8a66f42ec08, type: 3}
-          m_Scale: {x: 1, y: 1}
-          m_Offset: {x: 0, y: 0}
-      data:
-        first:
           name: _Fresnel
         second:
           m_Texture: {fileID: 2800000, guid: 5b5c5575fd4c74abd9f7b30862fb76a3, type: 3}
@@ -59,9 +45,23 @@ Material:
           m_Offset: {x: 0, y: 0}
       data:
         first:
+          name: _ReflectionTex
+        second:
+          m_Texture: {fileID: 0}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
           name: _RefractionTex
         second:
           m_Texture: {fileID: 0}
+          m_Scale: {x: 1, y: 1}
+          m_Offset: {x: 0, y: 0}
+      data:
+        first:
+          name: _ReflectiveColorCube
+        second:
+          m_Texture: {fileID: 8900000, guid: 9cda328e4b6954d70841a8a66f42ec08, type: 3}
           m_Scale: {x: 1, y: 1}
           m_Offset: {x: 0, y: 0}
     m_Floats:
@@ -84,14 +84,6 @@ Material:
         second: {r: 1, g: 1, b: 0, a: 0}
       data:
         first:
-          name: _BumpMap_ST
-        second: {r: 1, g: 1, b: 0, a: 0}
-      data:
-        first:
-          name: WaveSpeed
-        second: {r: 2, g: 3, b: -4, a: -3.5}
-      data:
-        first:
           name: _RefrColor
         second: {r: 0.16176468, g: 0.16176468, b: 0.16176468, a: 0.453}
       data:
@@ -100,11 +92,15 @@ Material:
         second: {r: 1, g: 1, b: 0, a: 0}
       data:
         first:
-          name: _ReflectiveColor_ST
+          name: _BumpMap_ST
         second: {r: 1, g: 1, b: 0, a: 0}
       data:
         first:
-          name: _ReflectiveColorCube_ST
+          name: WaveSpeed
+        second: {r: 2, g: 3, b: -4, a: -3.5}
+      data:
+        first:
+          name: _ReflectiveColor_ST
         second: {r: 1, g: 1, b: 0, a: 0}
       data:
         first:
@@ -117,6 +113,10 @@ Material:
       data:
         first:
           name: _RefractionTex_ST
+        second: {r: 1, g: 1, b: 0, a: 0}
+      data:
+        first:
+          name: _ReflectiveColorCube_ST
         second: {r: 1, g: 1, b: 0, a: 0}
 --- !u!1002 &2100001
 EditorExtensionImpl:

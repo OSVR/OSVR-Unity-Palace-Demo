@@ -140,9 +140,10 @@ namespace OSVR
                         int result = _renderManager.InitRenderManager();
                         if (result != 0)
                         {
-                            Debug.LogError("[OSVR-Unity] Failed to create RenderManager.");
+                            Debug.LogError("[OSVR-Unity] Failed to create RenderManager with result " + result);
                             _useRenderManager = false;
                         }
+                        else Debug.Log("[OSVR-Unity] Successfully created RenderManager!");
                     }
                 }
                 else
