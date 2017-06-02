@@ -221,7 +221,7 @@ namespace OSVR
             //"Recenter" based on current head orientation
             public void SetRoomRotationUsingHead()
             {
-#if UNITY_5_2 || UNITY_5_3 || UNITY_5_4 || UNITY_5_5
+#if UNITY_5_2 || UNITY_5_3 || UNITY_5_4 || UNITY_5_5 || UNITY_5_6
                 ClientKit.instance.context.SetRoomRotationUsingHead();
                 GL.IssuePluginEvent(GetRenderEventFunc(), 3);
 #endif
@@ -230,7 +230,7 @@ namespace OSVR
             //Clear the room-to-world transform, undo a call to SetRoomRotationUsingHead
             public void ClearRoomToWorldTransform()
             {
-#if UNITY_5_2 || UNITY_5_3 || UNITY_5_4 || UNITY_5_5
+#if UNITY_5_2 || UNITY_5_3 || UNITY_5_4 || UNITY_5_5 || UNITY_5_6
                 ClientKit.instance.context.ClearRoomToWorldTransform();
                 GL.IssuePluginEvent(GetRenderEventFunc(), 4);
 #endif
@@ -240,7 +240,7 @@ namespace OSVR
             public OSVR.ClientKit.Pose3 GetRenderManagerEyePose(int eye)
             {
                 OSVR.ClientKit.Pose3 p = GetEyePose(eye);
-                Debug.Log("[OSVR-Unity] RM Eye " + eye + " pose: (" + p.rotation.x +", " + p.rotation.y + ", " + p.rotation.z + ", " + p.rotation.w + ")");
+               // Debug.Log("[OSVR-Unity] RM Eye " + eye + " pose: (" + p.rotation.x +", " + p.rotation.y + ", " + p.rotation.z + ", " + p.rotation.w + ")");
                 return p;
             }
 
@@ -253,6 +253,7 @@ namespace OSVR
                 v.Bottom = (int)viewportDescription.lower;
                 v.Width = (int)viewportDescription.width;
                 v.Height = (int)viewportDescription.height;
+               // Debug.Log("[OSVR-Unity]Viewport eye=" + eye + " left is: " + v.Left + "\nVBottom is: " + v.Bottom + "\nWidth is: " + v.Width + "\nHeight is: " + v.Height);
                 return v;
             }
 
