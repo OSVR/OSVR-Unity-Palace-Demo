@@ -62,7 +62,7 @@ namespace OSVR
             public const int RENDER_EVENT = 0;
             public const int SHUTDOWN_EVENT = 1;
             public const int UPDATE_RENDERINFO_EVENT = 2;
-            private const string PluginName = "osvrUnityAndroidRenderingPlugin";
+            private const string PluginName = "osvrUnityRenderingPlugin";
 
             [UnmanagedFunctionPointer(CallingConvention.Winapi)]
             private delegate void DebugLog(string log);
