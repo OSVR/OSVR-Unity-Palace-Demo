@@ -23,6 +23,12 @@ Here is an [Android apk](https://github.com/OSVR/OSVR-Unity-Palace-Demo/releases
 See the [Android branch README](https://github.com/OSVR/OSVR-Unity-Palace-Demo/blob/androidPalace/README.md) for more information.
 
 ## Recent Changes
+### v0.6.18
+> (August 17, 2017)
+
+- Update to OSVRUnity build 643
+- Removes fog due to Unity 5.6 rendering bug
+
 ### v0.6.16.4
 > (March 9, 2017)
 
