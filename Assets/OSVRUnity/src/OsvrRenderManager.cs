@@ -191,7 +191,6 @@ namespace OSVR
                     //only use for debugging purposes, do not leave on for release.
                     LinkDebug(functionPointer); // Hook our c++ plugin into Unity's console log.
                 }
-                Debug.LogError("[OSVR-Unity] After linkdebug, create rendermanager next");
 
                 return CreateRenderManager(ClientKit.instance.context);
             }
@@ -221,7 +220,7 @@ namespace OSVR
             //"Recenter" based on current head orientation
             public void SetRoomRotationUsingHead()
             {
-#if UNITY_5_2 || UNITY_5_3 || UNITY_5_4 || UNITY_5_5 || UNITY_5_6
+#if UNITY_5_2 || UNITY_5_3 || UNITY_5_4 || UNITY_5_5 || UNITY_5_6 || UNITY_2017
                 ClientKit.instance.context.SetRoomRotationUsingHead();
                 GL.IssuePluginEvent(GetRenderEventFunc(), 3);
 #endif
@@ -230,7 +229,7 @@ namespace OSVR
             //Clear the room-to-world transform, undo a call to SetRoomRotationUsingHead
             public void ClearRoomToWorldTransform()
             {
-#if UNITY_5_2 || UNITY_5_3 || UNITY_5_4 || UNITY_5_5 || UNITY_5_6
+#if UNITY_5_2 || UNITY_5_3 || UNITY_5_4 || UNITY_5_5 || UNITY_5_6 || UNITY_2017
                 ClientKit.instance.context.ClearRoomToWorldTransform();
                 GL.IssuePluginEvent(GetRenderEventFunc(), 4);
 #endif
@@ -239,9 +238,7 @@ namespace OSVR
             //Get the pose of a given eye from RenderManager
             public OSVR.ClientKit.Pose3 GetRenderManagerEyePose(int eye)
             {
-                OSVR.ClientKit.Pose3 p = GetEyePose(eye);
-               // Debug.Log("[OSVR-Unity] RM Eye " + eye + " pose: (" + p.rotation.x +", " + p.rotation.y + ", " + p.rotation.z + ", " + p.rotation.w + ")");
-                return p;
+                return GetEyePose(eye);
             }
 
             //Get the viewport of a given eye from RenderManager
@@ -253,7 +250,6 @@ namespace OSVR
                 v.Bottom = (int)viewportDescription.lower;
                 v.Width = (int)viewportDescription.width;
                 v.Height = (int)viewportDescription.height;
-               // Debug.Log("[OSVR-Unity]Viewport eye=" + eye + " left is: " + v.Left + "\nVBottom is: " + v.Bottom + "\nWidth is: " + v.Width + "\nHeight is: " + v.Height);
                 return v;
             }
 
@@ -337,12 +333,14 @@ namespace OSVR
             public bool IsRenderManagerSupported()
             {
                 bool support = true;
-                /*
-#if UNITY_ANDROID
-                Debug.Log("[OSVR-Unity] RenderManager not yet supported on Android.");
+#if UNITY_OSX
+                Debug.Log("[OSVR-Unity] RenderManager not yet supported on OSX.");
                 support = false;
 #endif
-*/
+#if UNITY_LINUX
+                Debug.Log("[OSVR-Unity] RenderManager not yet supported on Linuc.");
+                support = false;
+#endif
                 if (!SystemInfo.graphicsDeviceVersion.Contains("OpenGL") && !SystemInfo.graphicsDeviceVersion.Contains("Direct3D 11"))
                 {
                     Debug.LogError("[OSVR-Unity] RenderManager not supported on " +

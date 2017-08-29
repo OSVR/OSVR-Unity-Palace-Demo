@@ -186,8 +186,9 @@ namespace OSVR
             {
                 if (DisplayController.UseRenderManager)
                 {
-                    //Update RenderInfo
-#if UNITY_5_2 || UNITY_5_3 || UNITY_5_4 || UNITY_5_5 || UNITY_5_6
+                    // Update RenderInfo
+                    // RenderManager supported on unity 5.2+
+#if !(UNITY_5_1 || UNIT_5_0 || UNITY_4_7 || UNITY_4_6)
                     GL.IssuePluginEvent(DisplayController.RenderManager.GetRenderEventFunction(), OsvrRenderManager.UPDATE_RENDERINFO_EVENT);
 #else
                     Debug.LogError("[OSVR-Unity] GL.IssuePluginEvent failed. This version of Unity cannot support RenderManager.");
@@ -239,6 +240,12 @@ namespace OSVR
 
                 DoRendering();
 
+                //Sends queued-up commands in the driver's command buffer to the GPU.
+                //only accessible in Unity 5.4+ API
+#if !(UNITY_5_3 || UNITY_5_2 || UNITY_5_1 || UNITY_5_0 || UNITY_4_7 || UNITY_4_6)
+                GL.Flush();
+#endif
+
                 // Flag that we disabled the camera
                 _disabledCamera = true;
             }
@@ -286,15 +293,11 @@ namespace OSVR
                     if (DisplayController.UseRenderManager && DisplayController.CheckDisplayStartup())
                     {
                         // Issue a RenderEvent, which copies Unity RenderTextures to RenderManager buffers
-#if UNITY_5_2 || UNITY_5_3 || UNITY_5_4 || UNITY_5_5 || UNITY_5_6
+                        // RenderManager supported on unity 5.2+
+#if !(UNITY_5_1 || UNIT_5_0 || UNITY_4_7 || UNITY_4_6)
                         GL.Viewport(_emptyViewport);
                         GL.Clear(false, true, Camera.backgroundColor);                      
-                        GL.IssuePluginEvent(DisplayController.RenderManager.GetRenderEventFunction(), OsvrRenderManager.RENDER_EVENT); 
-                        if(DisplayController.showDirectModePreview)
-                        {
-                            Camera.Render();
-                        } 
-                                             
+                        GL.IssuePluginEvent(DisplayController.RenderManager.GetRenderEventFunction(), OsvrRenderManager.RENDER_EVENT);                    
 #else
                         Debug.LogError("[OSVR-Unity] GL.IssuePluginEvent failed. This version of Unity cannot support RenderManager.");
                         DisplayController.UseRenderManager = false;
@@ -306,7 +309,11 @@ namespace OSVR
                         Camera.enabled = true;
                         _disabledCamera = false;
                     }
-
+                    //Sends queued-up commands in the driver's command buffer to the GPU.
+                    //only accessible in Unity 5.4+ API
+#if !(UNITY_5_3 || UNITY_5_2 || UNITY_5_1 || UNITY_5_0 || UNITY_4_7 || UNITY_4_6)
+                GL.Flush();
+#endif
                 }
             }             
         }

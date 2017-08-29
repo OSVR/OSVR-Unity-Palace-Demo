@@ -70,8 +70,6 @@ namespace OSVR
             public VRViewer[] Viewers { get { return _viewers; } }
             public uint ViewerCount { get { return _viewerCount; } }
             public OsvrRenderManager RenderManager { get { return _renderManager; } }
-            [Tooltip("Renders an extra camera to show what the HMD user sees while in Direct Mode. Comes at a framerate cost until this feature becomes part of RenderManager.")]
-            public bool showDirectModePreview = false; //should the monitor show what the user sees in the HMD?
 
             public uint TotalDisplayWidth
             {
@@ -97,14 +95,13 @@ namespace OSVR
             }
 
             void SetupApplicationSettings()
-            {
-                //VR should never timeout the screen:
-                Screen.sleepTimeout = SleepTimeout.NeverSleep;
-
-                //Set the framerate
-                //@todo get this value from OSVR, not a const value
-                //Performance note: Developers should try setting Time.fixedTimestep to 1/Application.targetFrameRate
-                //Application.targetFrameRate = TARGET_FRAME_RATE;
+            {             
+                //Set the framerate and performance settings
+                Application.targetFrameRate = -1;
+                Application.runInBackground = true;
+                QualitySettings.vSyncCount = 0;
+                QualitySettings.maxQueuedFrames = -1; //limit the number of frames queued up to be rendered, reducing latency
+                Screen.sleepTimeout = SleepTimeout.NeverSleep;  //VR should never timeout the screen:
             }
 
             // Setup RenderManager for DirectMode or non-DirectMode rendering.
@@ -140,10 +137,9 @@ namespace OSVR
                         int result = _renderManager.InitRenderManager();
                         if (result != 0)
                         {
-                            Debug.LogError("[OSVR-Unity] Failed to create RenderManager with result " + result);
+                            Debug.LogError("[OSVR-Unity] Failed to create RenderManager.");
                             _useRenderManager = false;
                         }
-                        else Debug.Log("[OSVR-Unity] Successfully created RenderManager!");
                     }
                 }
                 else
@@ -264,9 +260,9 @@ namespace OSVR
                         GameObject vrViewer = viewer.gameObject;
                         vrViewer.name = "VRViewer" + viewerIndex; //change its name to VRViewer0
                         //@todo optionally add components                      
-                        if (vrViewer.GetComponent<AudioListener>() == null)
+                        if (FindObjectOfType<AudioListener>() == null)
                         {
-                            vrViewer.AddComponent<AudioListener>(); //add an audio listener
+                            vrViewer.AddComponent<AudioListener>(); // add an audio listener if there are none in the scene
                         }
                         viewer.DisplayController = this; //pass DisplayController to Viewers  
                         viewer.ViewerIndex = viewerIndex; //set the viewer's index                         
@@ -290,9 +286,9 @@ namespace OSVR
                 {
                     // create a VRViewer
                     GameObject vrViewer = new GameObject("VRViewer" + viewerIndex);
-                    if (vrViewer.GetComponent<AudioListener>() == null)
+                    if (FindObjectOfType<AudioListener>() == null)
                     {
-                        vrViewer.AddComponent<AudioListener>(); //add an audio listener
+                        vrViewer.AddComponent<AudioListener>(); //add an audio listener if there are none in the scene
                     }
 
                     VRViewer vrViewerComponent = vrViewer.AddComponent<VRViewer>();
@@ -317,6 +313,12 @@ namespace OSVR
                 {
                     SetupDisplay();
                 }
+
+                //Sends queued-up commands in the driver's command buffer to the GPU.
+                //only accessible in Unity 5.4+ API
+#if !(UNITY_5_3 || UNITY_5_2 || UNITY_5_1 || UNITY_5_0 || UNITY_4_7 || UNITY_4_6)
+                GL.Flush();
+#endif
             }
 
             //helper method for updating the client context

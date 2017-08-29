@@ -1,5 +1,3 @@
-
-using System.Runtime.InteropServices;
 /// OSVR-Unity Connection
 ///
 /// http://sensics.com/osvr
@@ -20,6 +18,9 @@ using System.Runtime.InteropServices;
 /// limitations under the License.
 /// </copyright>
 using UnityEngine;
+#if UNITY_ANDROID
+using System.Runtime.InteropServices;
+#endif
 
 namespace OSVR
 {
@@ -27,6 +28,8 @@ namespace OSVR
     {
         public class ClientKit : MonoBehaviour
         {
+            private const string OSVR_JAVA_CLASS_PATH = "org.osvr.osvrunityjni.OsvrJNIWrapper";
+
             [Tooltip("A string uniquely identifying your application, in reverse domain-name format.")]
             public string AppID;
 
@@ -40,7 +43,22 @@ namespace OSVR
             /// Uses the Unity "Persistent Singleton" pattern, see http://unitypatterns.com/singletons/
             private static ClientKit _instance;
             private bool _osvrServerError = false;
-			private bool _dllFixed = false;
+            private bool _dllFixed = false;
+
+#if UNITY_ANDROID
+            //load OSVR-Android libraries via JNI
+            private void LoadOsvrAndroidLibraries()
+            {
+                //get the OSVR JNI-Wrapper Java class
+                AndroidJavaObject javaClass = new AndroidJavaObject(OSVR_JAVA_CLASS_PATH);
+                if (javaClass != null)
+                {
+                    //initialize and load OSVR libraries
+                    javaClass.Call("init", new object[0]);
+                    javaClass.Call("loadLibraries");
+                }
+            }
+#endif
 
             /// <summary>
             /// Use to access the single instance of this object/script in your game.
@@ -50,7 +68,7 @@ namespace OSVR
             {
                 get
                 {
-                    if(_instance == null)
+                    if (_instance == null)
                     {
                         _instance = GameObject.FindObjectOfType<ClientKit>();
                         if (_instance == null)
@@ -80,35 +98,22 @@ namespace OSVR
 
             private void EnsureStarted()
             {
-				if (!_dllFixed)
+                if (!_dllFixed)
                 {
                     DLLSearchPathFixer.fix();
                     _dllFixed = true;
                 }
 
-#if UNITY_STANDALONE_WIN || UNITY_ANDROID
+
                 if (_serverAutoStarter == null && autoStartServer)
                 {
-
-                    Debug.Log("[OSVR-Unity] About to load android libraries");
-                    // AndroidJavaClass unity = new AndroidJavaClass("org.osvr.osvrunityandroid");
-                    // AndroidJavaObject currentActivity = unity.GetStatic<AndroidJavaObject>("currentActivity");
-                    // currentActivity.Call("loadLibraries");
-                    Debug.Log("[OSVR-Unity] Loaded android libraries");
-
-                    using (AndroidJavaClass javaClass = new AndroidJavaClass("org.osvr.osvrunityandroid.MainActivity"))
-                    {
-                        using (AndroidJavaObject activity = javaClass.GetStatic<AndroidJavaObject>("ctx"))
-                        {
-                            activity.Call("loadLibraries");
-                        }
-                    }
-
+#if UNITY_ANDROID
+                    LoadOsvrAndroidLibraries();
+#endif
                     _serverAutoStarter = new OSVR.ClientKit.ServerAutoStarter();
-                    Debug.Log("[OSVR-Unity] Autoserver started successfully, we think.");
 
                 }
-#endif
+
                 if (_contextObject == null)
                 {
                     if (0 == AppID.Length)
@@ -117,47 +122,47 @@ namespace OSVR
                         AppID = "com.osvr.osvr-unity.dummy";
                     }
                     Debug.Log("[OSVR-Unity] Starting with app ID: " + AppID);
-                    _contextObject = new OSVR.ClientKit.ClientContext(AppID, 0);                  
+                    _contextObject = new OSVR.ClientKit.ClientContext(AppID, 0);
                 }
 
 
                 //check if the server is running
                 if (!_contextObject.CheckStatus())
                 {
-                    if(!_osvrServerError)
+                    if (!_osvrServerError)
                     {
                         _osvrServerError = true;
                         Debug.LogError("[OSVR-Unity] OSVR Server not detected. Start OSVR Server and restart the application.");
-                    }                                    
+                    }
                 }
-                else if(_osvrServerError)
+                else if (_osvrServerError)
                 {
                     Debug.Log("[OSVR-Unity] OSVR Server connection established. You can ignore previous errors about the server not being detected.");
                     _osvrServerError = false;
                 }
 
-               
+
             }
 
             void Awake()
             {
-               
+
                 //if an instance of this singleton does not exist, set the instance to this object and make it persist
                 if (_instance == null)
                 {
                     _instance = this;
-					DontDestroyOnLoad(this);
+                    DontDestroyOnLoad(this);
                 }
                 else
                 {
                     //if an instance of this singleton already exists, destroy this one
-                    if(_instance != this)
+                    if (_instance != this)
                     {
                         Destroy(this.gameObject);
                     }
                 }
             }
-			
+
             void Start()
             {
                 Debug.Log("[OSVR-Unity] In Start()");
@@ -169,7 +174,7 @@ namespace OSVR
                 Debug.Log("[OSVR-Unity] In OnEnable()");
                 EnsureStarted();
             }
-            
+
             void Update()
             {
                 EnsureStarted();
@@ -180,9 +185,9 @@ namespace OSVR
             {
                 _contextObject.update();
             }
-			
+
             void Stop()
-        {
+            {
                 // Only stop the main instance, since it is the only one that
                 // ever actually starts-up.
                 if (this == instance)
@@ -193,7 +198,7 @@ namespace OSVR
                         _contextObject.Dispose();
                         _contextObject = null;
 #if UNITY_STANDALONE_WIN || UNITY_ANDROID
-                        if(_serverAutoStarter != null)
+                        if (_serverAutoStarter != null)
                         {
                             _serverAutoStarter.Dispose();
                             _serverAutoStarter = null;
