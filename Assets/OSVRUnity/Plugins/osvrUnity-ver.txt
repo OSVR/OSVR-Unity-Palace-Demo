@@ -1,1 +1,1 @@
-OSVR-Unity-v0.6.17.1-17-g561aef6-with-core-v0.6-2080-g8a0429a4-build643 
+OSVR-Unity-v0.6.17.1-15-g8e76433-with-core-v0.6-2080-g8a0429a4-build640 

@@ -5,8 +5,14 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Palace of Orinthalian/[Scenes]/Palace of Orinthalian/The Palace of
       Orinthalian.unity
+    guid: b920152deb8434843b139881bb2e4c9e
   - enabled: 0
     path: Assets/OSVRUnity/Sample/VRFirstPerson.unity
+    guid: 0a764d949e97bb2478149356e267cb2d
+  - enabled: 1
+    path: Assets/Palace of Orinthalian/[Scenes]/Palace of Orinthalian/The Palace of
+      Orinthalian_singlepass.unity
+    guid: 35f116e077baf9f449a622b4f026a23e

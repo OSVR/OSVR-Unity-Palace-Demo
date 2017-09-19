@@ -53,7 +53,18 @@ namespace OSVR
             {
                 if (mirrorCamera == null)
                 {
-                    mirrorCamera = FindObjectOfType<VREye>().GetComponentInChildren<Camera>();
+                    VREye eye = FindObjectOfType<VREye>();
+                    if(eye != null)
+                    {
+                        mirrorCamera = eye.GetComponent<Camera>();
+
+                    }
+                    else
+                    {                  
+                        //if there are no eyes, try to find a camera on the current object               
+                        mirrorCamera = GetComponent<Camera>();
+                    }
+
                 }
                 if (fillTexture == null)
                 {
@@ -66,6 +77,10 @@ namespace OSVR
 
             private void OnGUI()
             {
+                if(mirrorCamera == null || mirrorCamera.targetTexture == null)
+                {
+                    return;
+                }
                 if (Event.current.type.Equals(EventType.Repaint))
                 {
                     RefreshRectangles();
