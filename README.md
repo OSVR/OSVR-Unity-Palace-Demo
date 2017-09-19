@@ -23,6 +23,12 @@ Here is an [Android apk](https://github.com/OSVR/OSVR-Unity-Palace-Demo/releases
 See the [Android branch README](https://github.com/OSVR/OSVR-Unity-Palace-Demo/blob/androidPalace/README.md) for more information.
 
 ## Recent Changes
+### v0.8
+> (September 19, 2017)
+
+- Update to OSVRUnity v0.8
+- Adds Unity native VR support and new scene with single-pass camera setup
+
 ### v0.6.18
 > (August 17, 2017)
 
