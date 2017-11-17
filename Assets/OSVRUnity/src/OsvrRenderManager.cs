@@ -221,7 +221,7 @@ namespace OSVR
             public void SetRoomRotationUsingHead()
             {
 #if UNITY_5_2 || UNITY_5_3 || UNITY_5_4 || UNITY_5_5 || UNITY_5_6 || UNITY_2017
-                ClientKit.instance.context.SetRoomRotationUsingHead();
+              //  ClientKit.instance.context.SetRoomRotationUsingHead();
                 GL.IssuePluginEvent(GetRenderEventFunc(), 3);
 #endif
             }
