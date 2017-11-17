@@ -1,11 +1,16 @@
 fileFormatVersion: 2
-guid: e69db97d333a07441a4518170119c1e1
+guid: ce64d3f8c65ebc546a8285dabc8d265b
+timeCreated: 1507839964
+licenseType: Free
 PluginImporter:
   serializedVersion: 1
   iconMap: {}
   executionOrder: {}
   isPreloaded: 0
   platformData:
+    Any:
+      enabled: 1
+      settings: {}
     Editor:
       enabled: 0
       settings:
@@ -43,9 +48,6 @@ PluginImporter:
       enabled: 0
       settings:
         CPU: None
-    data:
-      enabled: 0
-      settings: {}
   userData: 
   assetBundleName: 
   assetBundleVariant: 
